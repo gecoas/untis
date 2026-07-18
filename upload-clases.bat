@@ -50,6 +50,14 @@ if errorlevel 8 (
     exit /b 1
 )
 
+echo Convirtiendo HTML a UTF-8...
+powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-ChildItem '%WORK_DIR%\clases\*.htm' | ForEach-Object { $c = [System.IO.File]::ReadAllText($_.FullName, [System.Text.Encoding]::Default); $c = $c -replace 'charset=iso-8859-1', 'charset=utf-8'; [System.IO.File]::WriteAllText($_.FullName, $c, (New-Object System.Text.UTF8Encoding($false))) }"
+if errorlevel 1 (
+    echo ERROR: No se pudo convertir los HTML a UTF-8.
+    pause
+    exit /b 1
+)
+
 cd /d "%WORK_DIR%"
 
 git add clases
