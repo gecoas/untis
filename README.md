@@ -11,7 +11,13 @@ Este repositorio contiene una hoja de estilos para mejorar la presentación de l
 <link rel="stylesheet" type="text/css" href="untis.css">
 ```
 
-3. Opcionalmente, ejecutar `add-css.ps1` desde PowerShell para añadir el enlace automáticamente.
+3. Opcionalmente, ejecutar `add-css.bat` desde la carpeta de los `.htm` para añadir el enlace automáticamente.
+
+```bat
+add-css.bat
+```
+
+Tambien se puede ejecutar `add-css.ps1` desde PowerShell.
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\add-css.ps1
