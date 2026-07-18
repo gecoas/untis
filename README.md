@@ -2,6 +2,14 @@
 
 Este repositorio contiene una hoja de estilos para mejorar la presentación de los horarios exportados desde Untis.
 
+La pagina de inicio del sitio es:
+
+```text
+clases/Clases.htm
+```
+
+El archivo `index.html` de la raiz redirige automaticamente a esa pagina.
+
 ## Uso
 
 1. Copiar `untis.css` en la misma carpeta que los archivos `.htm` exportados por Untis.
