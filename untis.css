@@ -311,20 +311,20 @@ table[cellspacing="1"][cellpadding="1"] img[src*="Gp"] {
 }
 
 table[cellspacing="1"][cellpadding="1"] a:has(img[src*="GpPrev"])::before {
-    content: "‹";
-    font-size: 30px;
+    content: "←";
+    font-size: 22px;
     line-height: 1;
 }
 
 table[cellspacing="1"][cellpadding="1"] a:has(img[src*="GpIndex"])::before {
-    content: "⌂";
-    font-size: 21px;
+    content: "🏠";
+    font-size: 18px;
     line-height: 1;
 }
 
 table[cellspacing="1"][cellpadding="1"] a:has(img[src*="GpNext"])::before {
-    content: "›";
-    font-size: 30px;
+    content: "→";
+    font-size: 22px;
     line-height: 1;
 }
 
