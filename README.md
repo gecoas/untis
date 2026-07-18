@@ -24,3 +24,14 @@ powershell -ExecutionPolicy Bypass -File .\add-css.ps1
 ```
 
 El CSS mantiene la estructura generada por Untis, mejora la legibilidad de las tablas y sustituye visualmente los iconos antiguos de navegación por botones modernos.
+
+## Subir la carpeta completa `clases` a GitHub desde Windows
+
+Guardar `upload-clases.bat` en la carpeta que contiene `clases`, por ejemplo:
+
+```text
+C:\Users\AsociacionAA\Desktop\Untis\upload-clases.bat
+C:\Users\AsociacionAA\Desktop\Untis\clases\
+```
+
+Después ejecutar `upload-clases.bat`. Requiere Git for Windows instalado y autenticado en GitHub.
