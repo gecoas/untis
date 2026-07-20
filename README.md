@@ -21,22 +21,8 @@ Colocar estos archivos junto a las carpetas de horarios:
 
 ```text
 untis.css
-apply-horarios.bat
 upload-horarios.bat
 ```
-
-Para preparar las cuatro carpetas localmente:
-
-```bat
-apply-horarios.bat
-```
-
-Este script:
-
-- Copia `untis.css` dentro de cada carpeta existente.
-- Añade el enlace CSS a todos los `.htm`.
-- Convierte los `.htm` a UTF-8.
-- Cambia los GIF antiguos de navegación por botones `←`, `🏠`, `→`.
 
 ## Subir a GitHub
 
@@ -53,19 +39,4 @@ Requisitos:
 - Git for Windows instalado.
 - Git autenticado contra GitHub.
 
-`upload-clases.bat` queda como compatibilidad y llama internamente a `upload-horarios.bat`.
-
 Si `clases-eso/Clases.htm` muestra un aviso, significa que todavía no se ha subido la exportación real de clases de ESO.
-
-## Scripts Individuales
-
-También existen scripts para usar dentro de una carpeta concreta:
-
-```bat
-add-css.bat
-fix-encoding.bat
-```
-
-`add-css.bat` añade el enlace a `untis.css`.
-
-`fix-encoding.bat` convierte los `.htm` a UTF-8.
