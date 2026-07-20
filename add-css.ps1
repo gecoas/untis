@@ -1,4 +1,4 @@
-# Ejecuta esto en PowerShell en la carpeta de los .htm exportados por Untis.
+# Ejecuta esto en PowerShell en cualquier carpeta de los .htm exportados por Untis.
 # Anade el enlace al CSS a todos los archivos .htm.
 
 $cssLink = '<link rel="stylesheet" type="text/css" href="untis.css">'
