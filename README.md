@@ -4,11 +4,7 @@ Este repositorio contiene una hoja de estilos para mejorar la presentación de h
 
 ## Estructura
 
-La página de inicio del sitio redirige a:
-
-```text
-clases-pri/Clases.htm
-```
+La página de inicio del sitio es `index.html` y muestra cuatro accesos: clases de Primaria, profesores de Primaria, clases de ESO y profesores de ESO.
 
 Carpetas esperadas:
 
