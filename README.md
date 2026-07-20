@@ -34,6 +34,8 @@ upload-horarios.bat
 
 Este script clona `https://github.com/gecoas/untis.git`, copia las carpetas existentes, aplica CSS/UTF-8/iconos y hace commit y push.
 
+El script exige que existan las cuatro carpetas y que cada una contenga archivos `.htm`. Si falta `clases-eso` o está vacía, se detiene para evitar una subida incompleta.
+
 Requisitos:
 
 - Git for Windows instalado.

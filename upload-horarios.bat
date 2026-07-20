@@ -19,13 +19,21 @@ if errorlevel 1 (
     exit /b 1
 )
 
-set "FOUND=0"
+set "MISSING=0"
 for %%d in (%FOLDERS%) do (
-    if exist "%ROOT%%%d\" set "FOUND=1"
+    if not exist "%ROOT%%%d\" (
+        echo ERROR: No existe la carpeta %%d junto a este .bat.
+        set "MISSING=1"
+    ) else (
+        dir "%ROOT%%%d\*.htm" /b >nul 2>nul
+        if errorlevel 1 (
+            echo ERROR: La carpeta %%d no contiene archivos .htm.
+            set "MISSING=1"
+        )
+    )
 )
 
-if "%FOUND%"=="0" (
-    echo ERROR: No se encontro ninguna carpeta de horarios.
+if "%MISSING%"=="1" (
     echo Deben estar junto a este .bat: %FOLDERS%
     pause
     exit /b 1
@@ -57,7 +65,7 @@ for %%d in (%FOLDERS%) do (
         )
         copy /y "%WORK_DIR%\untis.css" "%WORK_DIR%\%%d\untis.css" >nul
         echo Preparando %%d...
-        powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-ChildItem '%WORK_DIR%\%%d\*.htm' | ForEach-Object { $c = [System.IO.File]::ReadAllText($_.FullName, [System.Text.Encoding]::Default); $badUpperA = [string]([char]0x00C3) + [char]0x0192 + [char]0x00C2 + [char]0x0081; if (-not $c.Contains('untis.css')) { $c = $c.Replace('</head>', '<link rel=' + [char]34 + 'stylesheet' + [char]34 + ' type=' + [char]34 + 'text/css' + [char]34 + ' href=' + [char]34 + 'untis.css' + [char]34 + '>' + [Environment]::NewLine + '</head>') }; if (($_.BaseName -eq 'Clases' -or $_.BaseName -eq 'Profesores') -and (-not $c.Contains('home-link'))) { $c = $c -replace '<CENTER>', '<CENTER><div class=''home-link-wrap''><a class=''home-link'' href=''../index.html''>&#8592; Volver al inicio</a></div>' }; $c = $c -replace 'charset=iso-8859-1', 'charset=utf-8'; $c = $c -replace $badUpperA, 'Á'; $c = $c -replace 'Ã‚º','º' -replace 'Ã‚ª','ª' -replace 'ÃƒÂ¡','á' -replace 'ÃƒÂ©','é' -replace 'ÃƒÂ­','í' -replace 'ÃƒÂ³','ó' -replace 'ÃƒÂº','ú' -replace 'ÃƒÂ±','ñ' -replace 'Ãƒ¡','á' -replace 'Ãƒé','é' -replace 'Ãƒí','í' -replace 'Ãƒó','ó' -replace 'Ãƒº','ú' -replace 'Ãƒñ','ñ' -replace 'Âº','º' -replace 'Âª','ª' -replace 'Ã¡','á' -replace 'Ã©','é' -replace 'Ã­','í' -replace 'Ã³','ó' -replace 'Ãº','ú' -replace 'Ã±','ñ' -replace 'Ã','Á'; $c = $c -replace '<img\s+src=\"GpPrev\.gif\"[^>]*>', '<span class=\"nav-icon nav-prev\">&#8592;</span>'; $c = $c -replace '<img\s+src=\"GpIndex\.gif\"[^>]*>', '<span class=\"nav-icon nav-home\">&#127968;</span>'; $c = $c -replace '<img\s+src=\"GpNext\.gif\"[^>]*>', '<span class=\"nav-icon nav-next\">&#8594;</span>'; [System.IO.File]::WriteAllText($_.FullName, $c, (New-Object System.Text.UTF8Encoding($false))) }"
+        powershell -NoProfile -ExecutionPolicy Bypass -Command "$utf8Strict = New-Object System.Text.UTF8Encoding -ArgumentList $false, $true; $utf8NoBom = New-Object System.Text.UTF8Encoding -ArgumentList $false; $win1252 = [System.Text.Encoding]::GetEncoding(1252); $codes = 0x00E1,0x00E9,0x00ED,0x00F3,0x00FA,0x00C1,0x00C9,0x00CD,0x00D3,0x00DA,0x00F1,0x00D1,0x00FC,0x00DC,0x00BA,0x00AA; Get-ChildItem '%WORK_DIR%\%%d\*.htm' | ForEach-Object { $bytes = [System.IO.File]::ReadAllBytes($_.FullName); try { $c = $utf8Strict.GetString($bytes) } catch { $c = [System.Text.Encoding]::Default.GetString($bytes) }; if (-not $c.Contains('untis.css')) { $c = $c.Replace('</head>', '<link rel=' + [char]34 + 'stylesheet' + [char]34 + ' type=' + [char]34 + 'text/css' + [char]34 + ' href=' + [char]34 + 'untis.css' + [char]34 + '>' + [Environment]::NewLine + '</head>') }; if (($_.BaseName -eq 'Clases' -or $_.BaseName -eq 'Profesores') -and (-not $c.Contains('home-link'))) { $c = $c -replace '<CENTER>', '<CENTER><div class=''home-link-wrap''><a class=''home-link'' href=''../index.html''>&#8592; Volver al inicio</a></div>' }; $c = $c -replace 'charset=iso-8859-1', 'charset=utf-8'; foreach ($code in $codes) { $good = [string][char]$code; $bad = $good; 1..3 | ForEach-Object { $bad = $win1252.GetString([System.Text.Encoding]::UTF8.GetBytes($bad)); $c = $c.Replace($bad, $good) } }; $c = $c -replace '<img\s+src=\"GpPrev\.gif\"[^>]*>', '<span class=\"nav-icon nav-prev\">&#8592;</span>'; $c = $c -replace '<img\s+src=\"GpIndex\.gif\"[^>]*>', '<span class=\"nav-icon nav-home\">&#127968;</span>'; $c = $c -replace '<img\s+src=\"GpNext\.gif\"[^>]*>', '<span class=\"nav-icon nav-next\">&#8594;</span>'; [System.IO.File]::WriteAllText($_.FullName, $c, $utf8NoBom) }"
         if errorlevel 1 (
             echo ERROR: No se pudo preparar %%d.
             pause
