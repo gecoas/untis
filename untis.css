@@ -366,6 +366,32 @@ body > center > font[size="3"]:last-of-type {
     text-align: center;
 }
 
+.home-link-wrap {
+    display: flex;
+    justify-content: flex-start;
+    margin: 0 0 16px;
+}
+
+.home-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    color: #ffffff !important;
+    background: var(--blue-800);
+    border-radius: 999px;
+    box-shadow: 0 6px 16px rgba(7, 58, 85, 0.16);
+    font-size: 14px !important;
+    font-weight: 800 !important;
+    text-decoration: none !important;
+}
+
+.home-link:hover {
+    color: #ffffff !important;
+    background: var(--green);
+    text-decoration: none !important;
+}
+
 @media (max-width: 900px) {
     center {
         padding: 14px 8px;
