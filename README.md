@@ -55,6 +55,8 @@ Requisitos:
 
 `upload-clases.bat` queda como compatibilidad y llama internamente a `upload-horarios.bat`.
 
+Si `clases-eso/Clases.htm` muestra un aviso, significa que todavía no se ha subido la exportación real de clases de ESO.
+
 ## Scripts Individuales
 
 También existen scripts para usar dentro de una carpeta concreta:
