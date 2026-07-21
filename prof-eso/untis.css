@@ -619,7 +619,8 @@ body > center > font[size="3"]:last-of-type {
 
     table[border="3"][rules="all"] {
         width: 293mm !important;
-        min-height: 188mm;
+        height: auto !important;
+        min-height: 0;
         margin: 0 auto !important;
         border: 1px solid #7796a8 !important;
         box-shadow: none !important;
@@ -665,9 +666,21 @@ body > center > font[size="3"]:last-of-type {
 
     table[border="3"][rules="all"] > tbody > tr > td:first-child,
     table[border="3"][rules="all"] > tr > td:first-child {
-        width: 38px !important;
-        min-width: 38px !important;
+        width: 13mm !important;
+        min-width: 13mm !important;
         border-right-width: 1px !important;
+    }
+
+    table[border="3"][rules="all"] > tbody > tr > td[colspan="12"],
+    table[border="3"][rules="all"] > tr > td[colspan="12"] {
+        width: 56mm !important;
+        min-width: 56mm !important;
+        max-width: 56mm !important;
+    }
+
+    table[border="3"][rules="all"] > tbody > tr > td[colspan="12"] table,
+    table[border="3"][rules="all"] > tr > td[colspan="12"] table {
+        width: 100% !important;
     }
 
     table[border="3"][rules="all"] > tbody > tr > td:first-child *,
