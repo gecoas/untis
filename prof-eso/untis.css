@@ -593,10 +593,49 @@ body > center > font[size="3"]:last-of-type {
         padding: 0;
     }
 
-    body > center > font[size="3"]:first-child,
+    body > center > font[size="3"]:first-child {
+        display: block !important;
+        overflow: visible !important;
+        width: 96mm !important;
+        margin: 0 auto 6px !important;
+        padding: 0 !important;
+        color: #1f2933 !important;
+        background: transparent !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+    }
+
     body > center > .home-link-wrap + font[size="3"] > table:first-child,
-    body > center > font[size="3"] > table:first-child {
-        display: none !important;
+    body > center > font[size="3"] > table:first-child,
+    body > center > font[size="3"]:first-child table:first-child {
+        display: table !important;
+        width: 96mm !important;
+        min-height: 0 !important;
+        margin: 0 auto 6px !important;
+        color: #1f2933 !important;
+        background: transparent !important;
+        border: 0 !important;
+        border-collapse: collapse !important;
+        box-shadow: none !important;
+    }
+
+    body > center > .home-link-wrap + font[size="3"] > table:first-child td,
+    body > center > font[size="3"] > table:first-child td,
+    body > center > font[size="3"]:first-child table:first-child td {
+        padding: 1px 6px !important;
+        color: #1f2933 !important;
+        background: transparent !important;
+        border: 0 !important;
+        font-size: 11px !important;
+        line-height: 1.15 !important;
+        white-space: nowrap !important;
+    }
+
+    body > center > .home-link-wrap + font[size="3"] > table:first-child b,
+    body > center > font[size="3"] > table:first-child b,
+    body > center > font[size="3"]:first-child table:first-child b {
+        color: #1f2933 !important;
+        font-size: 12px !important;
     }
 
     body > center > font[size="5"],
@@ -611,10 +650,20 @@ body > center > font[size="3"]:last-of-type {
     .top-nav,
     .print-actions,
     .home-link-wrap,
-    body > center > font[size="3"]:last-child,
-    body > center > font[size="3"]:last-of-type,
     table[cellspacing="1"][cellpadding="1"]:not([border="3"]) {
         display: none !important;
+    }
+
+    body > center > font[size="3"]:last-child,
+    body > center > font[size="3"]:last-of-type {
+        display: block !important;
+        margin: 4px 0 0 !important;
+        padding: 0 !important;
+        color: #1f2933 !important;
+        border: 0 !important;
+        font-size: 12px !important;
+        line-height: 1.1 !important;
+        text-align: center !important;
     }
 
     table[border="3"][rules="all"] {
