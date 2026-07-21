@@ -578,11 +578,13 @@ body > center > font[size="3"]:last-of-type {
 @media print {
     @page {
         size: landscape;
-        margin: 8mm;
+        margin: 4mm;
     }
 
+    html,
     body {
         background: #ffffff !important;
+        font-size: 9px !important;
     }
 
     center {
@@ -590,15 +592,83 @@ body > center > font[size="3"]:last-of-type {
         padding: 0;
     }
 
+    body > center > font[size="3"]:first-child,
+    body > center > .home-link-wrap + font[size="3"] > table:first-child,
+    body > center > font[size="3"] > table:first-child {
+        display: none !important;
+    }
+
+    body > center > font[size="5"],
+    body > center > font[size="4"] {
+        margin: 0 0 4px !important;
+        padding: 0 0 3px !important;
+        border-bottom: 1px solid #7796a8 !important;
+        font-size: 14px !important;
+        line-height: 1.1 !important;
+    }
+
     .top-nav,
     .print-actions,
     .home-link-wrap,
+    body > center > font[size="3"]:last-child,
+    body > center > font[size="3"]:last-of-type,
     table[cellspacing="1"][cellpadding="1"]:not([border="3"]) {
         display: none !important;
     }
 
     table[border="3"][rules="all"] {
-        margin: 12px auto 0;
-        box-shadow: none;
+        width: 100% !important;
+        margin: 0 auto !important;
+        border: 1px solid #7796a8 !important;
+        box-shadow: none !important;
+        table-layout: fixed;
+        page-break-inside: avoid;
+    }
+
+    table[border="3"][rules="all"] td {
+        padding: 2px 1px !important;
+        border-width: 1px !important;
+        font-size: 8px !important;
+        line-height: 1.05 !important;
+        white-space: normal !important;
+    }
+
+    table[border="3"][rules="all"] td table td {
+        padding: 0 1px !important;
+    }
+
+    table[border="3"][rules="all"] b {
+        font-size: 8px !important;
+        line-height: 1.05 !important;
+    }
+
+    table[border="3"][rules="all"] i,
+    table[border="3"][rules="all"] font {
+        font-size: 7px !important;
+        line-height: 1.05 !important;
+    }
+
+    table[border="3"][rules="all"] > tbody > tr:first-child > td,
+    table[border="3"][rules="all"] > tr:first-child > td {
+        padding: 3px 1px !important;
+        border-bottom-width: 1px !important;
+    }
+
+    table[border="3"][rules="all"] > tbody > tr:first-child > td *,
+    table[border="3"][rules="all"] > tr:first-child > td * {
+        font-size: 8px !important;
+        letter-spacing: 0 !important;
+    }
+
+    table[border="3"][rules="all"] > tbody > tr > td:first-child,
+    table[border="3"][rules="all"] > tr > td:first-child {
+        width: 34px !important;
+        min-width: 34px !important;
+        border-right-width: 1px !important;
+    }
+
+    table[border="3"][rules="all"] > tbody > tr > td:first-child *,
+    table[border="3"][rules="all"] > tr > td:first-child * {
+        font-size: 7px !important;
     }
 }
