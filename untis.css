@@ -578,13 +578,13 @@ body > center > font[size="3"]:last-of-type {
 @media print {
     @page {
         size: landscape;
-        margin: 4mm;
+        margin: 3mm;
     }
 
     html,
     body {
         background: #ffffff !important;
-        font-size: 9px !important;
+        font-size: 11px !important;
     }
 
     center {
@@ -600,10 +600,10 @@ body > center > font[size="3"]:last-of-type {
 
     body > center > font[size="5"],
     body > center > font[size="4"] {
-        margin: 0 0 4px !important;
-        padding: 0 0 3px !important;
+        margin: 0 0 5px !important;
+        padding: 0 0 4px !important;
         border-bottom: 1px solid #7796a8 !important;
-        font-size: 14px !important;
+        font-size: 18px !important;
         line-height: 1.1 !important;
     }
 
@@ -623,29 +623,31 @@ body > center > font[size="3"]:last-of-type {
         box-shadow: none !important;
         table-layout: fixed;
         page-break-inside: avoid;
+        transform: scale(1.02);
+        transform-origin: top center;
     }
 
     table[border="3"][rules="all"] td {
-        padding: 2px 1px !important;
+        padding: 3px 2px !important;
         border-width: 1px !important;
-        font-size: 8px !important;
-        line-height: 1.05 !important;
+        font-size: 10px !important;
+        line-height: 1.12 !important;
         white-space: normal !important;
     }
 
     table[border="3"][rules="all"] td table td {
-        padding: 0 1px !important;
+        padding: 1px 1px !important;
     }
 
     table[border="3"][rules="all"] b {
-        font-size: 8px !important;
-        line-height: 1.05 !important;
+        font-size: 10px !important;
+        line-height: 1.12 !important;
     }
 
     table[border="3"][rules="all"] i,
     table[border="3"][rules="all"] font {
-        font-size: 7px !important;
-        line-height: 1.05 !important;
+        font-size: 9px !important;
+        line-height: 1.1 !important;
     }
 
     table[border="3"][rules="all"] > tbody > tr:first-child > td,
@@ -656,7 +658,7 @@ body > center > font[size="3"]:last-of-type {
 
     table[border="3"][rules="all"] > tbody > tr:first-child > td *,
     table[border="3"][rules="all"] > tr:first-child > td * {
-        font-size: 8px !important;
+        font-size: 10px !important;
         letter-spacing: 0 !important;
     }
 
@@ -669,6 +671,6 @@ body > center > font[size="3"]:last-of-type {
 
     table[border="3"][rules="all"] > tbody > tr > td:first-child *,
     table[border="3"][rules="all"] > tr > td:first-child * {
-        font-size: 7px !important;
+        font-size: 9px !important;
     }
 }
