@@ -329,7 +329,7 @@ table[border="3"][rules="all"] tr:hover td:first-child {
 }
 
 /* Pie y navegacion */
-table[cellspacing="1"][cellpadding="1"] {
+table[cellspacing="1"][cellpadding="1"]:not([border="3"]) {
     margin-top: 24px !important;
     padding: 14px 18px !important;
     background: var(--card) !important;
@@ -338,24 +338,24 @@ table[cellspacing="1"][cellpadding="1"] {
     box-shadow: 0 8px 24px rgba(7, 58, 85, 0.09);
 }
 
-table[cellspacing="1"][cellpadding="1"] td {
+table[cellspacing="1"][cellpadding="1"]:not([border="3"]) td {
     padding: 5px 8px !important;
     background: transparent !important;
     border: 0 !important;
     vertical-align: middle !important;
 }
 
-table[cellspacing="1"][cellpadding="1"] font,
-table[cellspacing="1"][cellpadding="1"] a {
+table[cellspacing="1"][cellpadding="1"]:not([border="3"]) font,
+table[cellspacing="1"][cellpadding="1"]:not([border="3"]) a {
     color: var(--blue-800) !important;
     font-size: 13px !important;
     font-weight: 700 !important;
 }
 
 /* Sustituir visualmente los GIF antiguos por botones elegantes */
-table[cellspacing="1"][cellpadding="1"] a:has(img[src*="GpPrev"]),
-table[cellspacing="1"][cellpadding="1"] a:has(img[src*="GpIndex"]),
-table[cellspacing="1"][cellpadding="1"] a:has(img[src*="GpNext"]) {
+table[cellspacing="1"][cellpadding="1"]:not([border="3"]) a:has(img[src*="GpPrev"]),
+table[cellspacing="1"][cellpadding="1"]:not([border="3"]) a:has(img[src*="GpIndex"]),
+table[cellspacing="1"][cellpadding="1"]:not([border="3"]) a:has(img[src*="GpNext"]) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -368,13 +368,13 @@ table[cellspacing="1"][cellpadding="1"] a:has(img[src*="GpNext"]) {
     text-decoration: none !important;
 }
 
-table[cellspacing="1"][cellpadding="1"] a:has(img[src*="GpPrev"]):hover,
-table[cellspacing="1"][cellpadding="1"] a:has(img[src*="GpIndex"]):hover,
-table[cellspacing="1"][cellpadding="1"] a:has(img[src*="GpNext"]):hover {
+table[cellspacing="1"][cellpadding="1"]:not([border="3"]) a:has(img[src*="GpPrev"]):hover,
+table[cellspacing="1"][cellpadding="1"]:not([border="3"]) a:has(img[src*="GpIndex"]):hover,
+table[cellspacing="1"][cellpadding="1"]:not([border="3"]) a:has(img[src*="GpNext"]):hover {
     background: var(--green);
 }
 
-table[cellspacing="1"][cellpadding="1"] img[src*="Gp"] {
+table[cellspacing="1"][cellpadding="1"]:not([border="3"]) img[src*="Gp"] {
     display: none !important;
 }
 
@@ -467,19 +467,19 @@ a:hover .nav-icon {
     background: var(--green);
 }
 
-table[cellspacing="1"][cellpadding="1"] a:has(img[src*="GpPrev"])::before {
+table[cellspacing="1"][cellpadding="1"]:not([border="3"]) a:has(img[src*="GpPrev"])::before {
     content: "←";
     font-size: 22px;
     line-height: 1;
 }
 
-table[cellspacing="1"][cellpadding="1"] a:has(img[src*="GpIndex"])::before {
+table[cellspacing="1"][cellpadding="1"]:not([border="3"]) a:has(img[src*="GpIndex"])::before {
     content: "🏠";
     font-size: 18px;
     line-height: 1;
 }
 
-table[cellspacing="1"][cellpadding="1"] a:has(img[src*="GpNext"])::before {
+table[cellspacing="1"][cellpadding="1"]:not([border="3"]) a:has(img[src*="GpNext"])::before {
     content: "→";
     font-size: 22px;
     line-height: 1;
@@ -593,7 +593,7 @@ body > center > font[size="3"]:last-of-type {
     .top-nav,
     .print-actions,
     .home-link-wrap,
-    table[cellspacing="1"][cellpadding="1"] {
+    table[cellspacing="1"][cellpadding="1"]:not([border="3"]) {
         display: none !important;
     }
 
