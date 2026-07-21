@@ -423,6 +423,37 @@ table[cellspacing="1"][cellpadding="1"] img[src*="Gp"] {
     font-size: 20px;
 }
 
+.print-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 0 0 18px;
+    flex-wrap: wrap;
+}
+
+.print-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 150px;
+    padding: 11px 18px;
+    color: #ffffff;
+    background: var(--blue-800);
+    border: 0;
+    border-radius: 999px;
+    box-shadow: 0 6px 16px rgba(7, 58, 85, 0.16);
+    font-family: var(--font);
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.print-action:hover,
+.print-action:focus {
+    background: var(--green);
+    outline: none;
+}
+
 .nav-prev,
 .nav-next {
     font-size: 22px;
@@ -541,5 +572,33 @@ body > center > font[size="3"]:last-of-type {
     table[border="3"][rules="all"] > tr > td:first-child {
         width: 64px !important;
         min-width: 64px !important;
+    }
+}
+
+@media print {
+    @page {
+        size: landscape;
+        margin: 8mm;
+    }
+
+    body {
+        background: #ffffff !important;
+    }
+
+    center {
+        max-width: none;
+        padding: 0;
+    }
+
+    .top-nav,
+    .print-actions,
+    .home-link-wrap,
+    table[cellspacing="1"][cellpadding="1"] {
+        display: none !important;
+    }
+
+    table[border="3"][rules="all"] {
+        margin: 12px auto 0;
+        box-shadow: none;
     }
 }
