@@ -578,7 +578,7 @@ body > center > font[size="3"]:last-of-type {
 @media print {
     @page {
         size: landscape;
-        margin: 3mm;
+        margin: 2mm;
     }
 
     html,
@@ -589,6 +589,7 @@ body > center > font[size="3"]:last-of-type {
 
     center {
         max-width: none;
+        width: 293mm;
         padding: 0;
     }
 
@@ -617,60 +618,60 @@ body > center > font[size="3"]:last-of-type {
     }
 
     table[border="3"][rules="all"] {
-        width: 100% !important;
+        width: 293mm !important;
+        min-height: 188mm;
         margin: 0 auto !important;
         border: 1px solid #7796a8 !important;
         box-shadow: none !important;
         table-layout: fixed;
         page-break-inside: avoid;
-        transform: scale(1.02);
-        transform-origin: top center;
+        transform: none;
     }
 
     table[border="3"][rules="all"] td {
-        padding: 3px 2px !important;
+        padding: 4px 2px !important;
         border-width: 1px !important;
-        font-size: 10px !important;
-        line-height: 1.12 !important;
+        font-size: 11px !important;
+        line-height: 1.15 !important;
         white-space: normal !important;
     }
 
     table[border="3"][rules="all"] td table td {
-        padding: 1px 1px !important;
+        padding: 2px 1px !important;
     }
 
     table[border="3"][rules="all"] b {
-        font-size: 10px !important;
-        line-height: 1.12 !important;
+        font-size: 11px !important;
+        line-height: 1.15 !important;
     }
 
     table[border="3"][rules="all"] i,
     table[border="3"][rules="all"] font {
-        font-size: 9px !important;
-        line-height: 1.1 !important;
+        font-size: 10px !important;
+        line-height: 1.12 !important;
     }
 
     table[border="3"][rules="all"] > tbody > tr:first-child > td,
     table[border="3"][rules="all"] > tr:first-child > td {
-        padding: 3px 1px !important;
+        padding: 4px 1px !important;
         border-bottom-width: 1px !important;
     }
 
     table[border="3"][rules="all"] > tbody > tr:first-child > td *,
     table[border="3"][rules="all"] > tr:first-child > td * {
-        font-size: 10px !important;
+        font-size: 11px !important;
         letter-spacing: 0 !important;
     }
 
     table[border="3"][rules="all"] > tbody > tr > td:first-child,
     table[border="3"][rules="all"] > tr > td:first-child {
-        width: 34px !important;
-        min-width: 34px !important;
+        width: 38px !important;
+        min-width: 38px !important;
         border-right-width: 1px !important;
     }
 
     table[border="3"][rules="all"] > tbody > tr > td:first-child *,
     table[border="3"][rules="all"] > tr > td:first-child * {
-        font-size: 9px !important;
+        font-size: 10px !important;
     }
 }
