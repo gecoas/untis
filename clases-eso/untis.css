@@ -137,8 +137,9 @@ body > center > font:first-child b {
     letter-spacing: -0.2px;
 }
 
-/* Titulo de grupo */
-body > center > font[size="5"] {
+/* Titulo de grupo o profesor */
+body > center > font[size="5"],
+body > center > font[size="4"] {
     display: block;
     margin: 10px 0 18px;
     padding-bottom: 14px;
@@ -273,6 +274,17 @@ table[border="3"][rules="all"] > tr > td[colspan="12"] {
 table[border="3"][rules="all"] > tbody > tr > td[rowspan="2"],
 table[border="3"][rules="all"] > tr > td[rowspan="2"] {
     border-bottom: 3px solid #91abb9 !important;
+}
+
+table[border="3"][rules="all"] > tbody > tr > td[rowspan="3"],
+table[border="3"][rules="all"] > tr > td[rowspan="3"],
+table[border="3"][rules="all"] > tbody > tr > td[rowspan="4"],
+table[border="3"][rules="all"] > tr > td[rowspan="4"],
+table[border="3"][rules="all"] > tbody > tr > td[rowspan="5"],
+table[border="3"][rules="all"] > tr > td[rowspan="5"],
+table[border="3"][rules="all"] > tbody > tr > td[rowspan="6"],
+table[border="3"][rules="all"] > tr > td[rowspan="6"] {
+    border-bottom: 4px solid #7796a8 !important;
 }
 
 table[border="3"][rules="all"] > tbody > tr > td:first-child *,
