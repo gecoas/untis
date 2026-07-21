@@ -392,6 +392,37 @@ table[cellspacing="1"][cellpadding="1"] img[src*="Gp"] {
     line-height: 1;
 }
 
+.top-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin: 4px 0 18px;
+    padding: 12px 16px;
+    background: #ffffff;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    box-shadow: 0 8px 22px rgba(7, 58, 85, 0.08);
+}
+
+.top-nav a {
+    text-decoration: none !important;
+}
+
+.top-nav .nav-icon {
+    width: 44px;
+    height: 44px;
+}
+
+.top-nav .nav-prev,
+.top-nav .nav-next {
+    font-size: 25px;
+}
+
+.top-nav .nav-home {
+    font-size: 20px;
+}
+
 .nav-prev,
 .nav-next {
     font-size: 22px;
