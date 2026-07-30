@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #f3f7fa;
+      color: #1f2933;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      color: #073a55;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      margin: 18px 0;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 10px 14px;
+      color: #fff;
+      background: #0b4f71;
+      border: 0;
+      border-radius: 999px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #15a085;
+    }
+
+    button.secondary {
+      color: #0b4f71;
+      background: #e8f4f8;
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    table {
+      width: 100%;
+      background: #fff;
+      border-collapse: collapse;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 10px 28px rgba(7, 58, 85, 0.11);
+    }
+
+    th,
+    td {
+      padding: 11px 10px;
+      border-bottom: 1px solid #d8e3ea;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: #fff;
+      background: #073a55;
+      font-size: 13px;
+    }
+
+    .small {
+      color: #5c6b73;
+      font-size: 12px;
+    }
+
+    .warning {
+      color: #9a3412;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .status {
+      margin: 10px 0;
+      color: #5c6b73;
+      font-weight: 700;
+    }
+
+    .attachments a {
+      display: block;
+      margin: 3px 0;
+      color: #0b4f71;
+      font-weight: 700;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Enviar horarios PDF</h1>
+  <div class="small">Revisa primero los PDFs generados. Después envía uno a uno o selecciona varios.</div>
+
+  <div class="toolbar">
+    <button onclick="loadRows()">Cargar lista</button>
+    <button onclick="sendSelectedRows()">Enviar seleccionados</button>
+  </div>
+
+  <div id="status" class="status"></div>
+  <div id="app"></div>
+
+  <script>
+    let rows = [];
+
+    function setStatus(message) {
+      document.getElementById('status').textContent = message || '';
+    }
+
+    function loadRows() {
+      setStatus('Cargando lista...');
+      google.script.run
+        .withSuccessHandler((data) => {
+          rows = data;
+          render();
+          setStatus('Lista cargada: ' + rows.length + ' profesores.');
+        })
+        .withFailureHandler(showError)
+        .getRows();
+    }
+
+    function render() {
+      const html = [
+        '<table>',
+        '<thead><tr><th></th><th>Profesor</th><th>Email</th><th>Tutoría</th><th>PDFs previstos</th><th>Previsualización</th><th>Acciones</th></tr></thead>',
+        '<tbody>'
+      ];
+      rows.forEach((row) => {
+        html.push('<tr>');
+        html.push('<td><input type="checkbox" value="' + escapeHtml(row.id) + '" ' + (row.attachments.length ? '' : 'disabled') + '></td>');
+        html.push('<td><strong>' + escapeHtml(row.profesor) + '</strong>' + warningsHtml(row) + '</td>');
+        html.push('<td>' + escapeHtml(row.email) + '</td>');
+        html.push('<td>' + escapeHtml(row.tutorDe || '') + '</td>');
+        html.push('<td>' + row.attachments.map((item) => escapeHtml(item.label + ': ' + item.fileName)).join('<br>') + '</td>');
+        html.push('<td class="attachments" id="preview-' + escapeHtml(row.id) + '"></td>');
+        html.push('<td><button class="secondary" onclick="previewRow(\'' + escapeJs(row.id) + '\')" ' + (row.attachments.length ? '' : 'disabled') + '>Generar/ver PDF</button> <button onclick="sendRow(\'' + escapeJs(row.id) + '\')" ' + (row.attachments.length ? '' : 'disabled') + '>Enviar</button></td>');
+        html.push('</tr>');
+      });
+      html.push('</tbody></table>');
+      document.getElementById('app').innerHTML = html.join('');
+    }
+
+    function warningsHtml(row) {
+      if (!row.warnings.length) return '';
+      return '<div class="warning">' + row.warnings.map(escapeHtml).join('<br>') + '</div>';
+    }
+
+    function previewRow(rowId) {
+      setStatus('Generando PDF...');
+      google.script.run
+        .withSuccessHandler((files) => {
+          const target = document.getElementById('preview-' + rowId);
+          target.innerHTML = files.map((file) => '<a href="' + escapeHtml(file.url) + '" target="_blank">' + escapeHtml(file.label + ': ' + file.fileName) + '</a>').join('');
+          setStatus('PDF generado. Revísalo antes de enviar.');
+        })
+        .withFailureHandler(showError)
+        .generatePreview(rowId);
+    }
+
+    function sendRow(rowId) {
+      if (!confirm('¿Enviar los PDF de este profesor?')) return;
+      setStatus('Enviando email...');
+      google.script.run
+        .withSuccessHandler((result) => setStatus('Enviado a ' + result.email + ': ' + result.attachments.join(', ')))
+        .withFailureHandler(showError)
+        .sendRow(rowId);
+    }
+
+    function sendSelectedRows() {
+      const ids = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map((input) => input.value);
+      if (!ids.length) {
+        alert('Selecciona al menos un profesor.');
+        return;
+      }
+      if (!confirm('¿Enviar los PDF a ' + ids.length + ' profesores?')) return;
+      setStatus('Enviando seleccionados...');
+      google.script.run
+        .withSuccessHandler((results) => setStatus('Envíos completados: ' + results.length))
+        .withFailureHandler(showError)
+        .sendSelected(ids);
+    }
+
+    function showError(error) {
+      setStatus('ERROR: ' + (error.message || error));
+    }
+
+    function escapeHtml(value) {
+      return String(value || '').replace(/[&<>"]/g, (char) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[char]));
+    }
+
+    function escapeJs(value) {
+      return String(value || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    }
+
+    loadRows();
+  </script>
+</body>
+</html>
