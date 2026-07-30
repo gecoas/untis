@@ -39,6 +39,12 @@ No uses la contraseña normal de Gmail.
 
 ## Simular
 
+Revisar mapeos sin generar PDFs ni enviar correos:
+
+```powershell
+python scripts/send_primaria_pdfs.py --plan
+```
+
 Primero genera PDFs y muestra qué enviaría, sin mandar correos:
 
 ```powershell
