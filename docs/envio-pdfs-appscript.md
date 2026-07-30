@@ -8,7 +8,7 @@ Este flujo usa Google Apps Script para generar PDFs desde la web publicada y env
 - Para cada profesor muestra los PDFs previstos.
 - Permite generar y abrir el PDF para comprobarlo antes de enviar.
 - Envía el PDF del profesor por Gmail.
-- Si el profesor es tutor, añade también el PDF del grupo.
+- Si el profesor es tutor, añade también el PDF del grupo, tanto de Primaria como de ESO/Bachillerato.
 
 ## Preparar Google Sheet
 
@@ -18,7 +18,16 @@ Crea una hoja de cálculo privada con una pestaña llamada `Primaria` y estas co
 Profesor | email | Tutor de Grupo
 ```
 
-Pega ahí la lista de profesores. No se sube a GitHub.
+Pega ahí la lista completa de profesores. Puede incluir profesores de Primaria, ESO y Bachillerato. No se sube a GitHub.
+
+El campo `Tutor de Grupo` acepta valores como:
+
+```text
+4º A Primaria
+1º ESO A
+2º Bachillerato B
+BAC 1A
+```
 
 ## Crear Apps Script
 

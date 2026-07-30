@@ -17,11 +17,64 @@ const PROFESSOR_TIMETABLES = [
   ['Ruiz Neira Marcos', 'prof-pri/Profesores_Marc.htm'],
   ['Bibián Lamarca Michel', 'prof-pri/Profesores_Mich.htm'],
   ['Regaña Guerrero Monte', 'prof-pri/Profesores_Mont.htm'],
+  ['San Miguel Nacho', 'prof-pri/Profesores_Nacho.htm'],
   ['Valverde Álvarez Patricia', 'prof-pri/Profesores_Pat6.htm'],
   ['Jiménez Navajas Raúl', 'prof-pri/Profesores_Rafal.htm'],
   ['Latorre Tobias Rocio', 'prof-pri/Profesores_Roci.htm'],
   ['Sáenz Garbayo Vanesa', 'prof-pri/Profesores_Van2.htm'],
-  ['Mata Pons Wenceslao', 'prof-pri/Profesores_Wen.htm']
+  ['Mata Pons Wenceslao', 'prof-pri/Profesores_Wen.htm'],
+  ['Huergo Olagaray Alba', 'prof-eso/Profesores_Alba.htm'],
+  ['López Velasco Ana', 'prof-eso/Profesores_Ana2345.htm'],
+  ['León Miranda Carmen', 'prof-eso/Profesores_Car5.htm'],
+  ['López López Carlos D', 'prof-eso/Profesores_Car6.htm'],
+  ['López Carmen', 'prof-eso/Profesores_Carm.htm'],
+  ['Álvarez Marín Celia', 'prof-eso/Profesores_Celi.htm'],
+  ['Bueno Ruiz David', 'prof-eso/Profesores_Davi.htm'],
+  ['Rodríguez Casado Ele', 'prof-eso/Profesores_Ele2.htm'],
+  ['Bermejo Cruz Guiller', 'prof-eso/Profesores_Guil.htm'],
+  ['González De La Puent', 'prof-eso/Profesores_Hugo.htm'],
+  ['Borraz Viver Inmacul', 'prof-eso/Profesores_Inma.htm'],
+  ['Ávila Pérez Ion', 'prof-eso/Profesores_Ion.htm'],
+  ['Caballero Dávila Jes', 'prof-eso/Profesores_Jesfa.htm'],
+  ['Martínez González Ju', 'prof-eso/Profesores_Jua3.htm'],
+  ['De Pablos Alvarez La', 'prof-eso/Profesores_Lau2.htm'],
+  ['Espiño Perez Lorena', 'prof-eso/Profesores_Lore.htm'],
+  ['Fernández Artazcoz M', 'prof-eso/Profesores_Maa_J.htm'],
+  ['Cortizo Ameal María', 'prof-eso/Profesores_Mar10.htm'],
+  ['Irigaray Murillo Mar', 'prof-eso/Profesores_Mar11.htm'],
+  ['Ruiz Neira Marcos', 'prof-eso/Profesores_Marc.htm'],
+  ['Bibián Lamarca Miche', 'prof-eso/Profesores_Mich.htm'],
+  ['García Suarez Pablo', 'prof-eso/Profesores_Pab2.htm'],
+  ['Ortiz Martínez Patri', 'prof-eso/Profesores_Pat2.htm'],
+  ['Ruiz Lucendo Ramón', 'prof-eso/Profesores_Ramf3.htm'],
+  ['Fernández Martínez S', 'prof-eso/Profesores_Susa.htm']
+];
+
+const CLASS_TIMETABLES = [
+  ['1º Primaria A', 'clases-pri/Clases_PRI_1A.htm'],
+  ['1º Primaria B', 'clases-pri/Clases_PRI_1B.htm'],
+  ['2º Primaria A', 'clases-pri/Clases_PRI_2A.htm'],
+  ['2º Primaria B', 'clases-pri/Clases_PRI_2B.htm'],
+  ['3º Primaria A', 'clases-pri/Clases_PRI_3A.htm'],
+  ['3º Primaria B', 'clases-pri/Clases_PRI_3B.htm'],
+  ['4º Primaria A', 'clases-pri/Clases_PRI_4A.htm'],
+  ['4º Primaria B', 'clases-pri/Clases_PRI_4B.htm'],
+  ['5º Primaria A', 'clases-pri/Clases_PRI_5A.htm'],
+  ['5º Primaria B', 'clases-pri/Clases_PRI_5B.htm'],
+  ['6º Primaria A', 'clases-pri/Clases_PRI_6A.htm'],
+  ['6º Primaria B', 'clases-pri/Clases_PRI_6B.htm'],
+  ['1º ESO A', 'clases-eso/Clases_ESO_1A.htm'],
+  ['1º ESO B', 'clases-eso/Clases_ESO_1B.htm'],
+  ['2º ESO A', 'clases-eso/Clases_ESO_2A.htm'],
+  ['2º ESO B', 'clases-eso/Clases_ESO_2B.htm'],
+  ['3º ESO A', 'clases-eso/Clases_ESO_3A.htm'],
+  ['3º ESO B', 'clases-eso/Clases_ESO_3B.htm'],
+  ['4º ESO A', 'clases-eso/Clases_ESO_4A.htm'],
+  ['4º ESO B', 'clases-eso/Clases_ESO_4B.htm'],
+  ['1º Bachillerato A', 'clases-eso/Clases_BAC_1A.htm'],
+  ['1º Bachillerato B', 'clases-eso/Clases_BAC_1B.htm'],
+  ['2º Bachillerato A', 'clases-eso/Clases_BAC_2A.htm'],
+  ['2º Bachillerato B', 'clases-eso/Clases_BAC_2B.htm']
 ];
 
 function doGet() {
@@ -168,7 +221,7 @@ function matchProfessor_(name) {
   let bestScore = 0;
   PROFESSOR_TIMETABLES.forEach(([title, path]) => {
     const available = tokens_(title);
-    const overlap = wanted.filter((token) => available.indexOf(token) !== -1).length;
+    const overlap = wanted.filter((token) => available.some((candidate) => tokenMatches_(token, candidate))).length;
     const score = Math.max(overlap / Math.max(wanted.length, 1), overlap / Math.max(available.length, 1));
     if (score > bestScore) {
       bestScore = score;
@@ -180,9 +233,37 @@ function matchProfessor_(name) {
 
 function classPathFromTutor_(value) {
   if (!value) return null;
-  const match = normalize_(value).match(/\b([1-6])\s*o?\s*([ab])\b/);
-  if (!match) return null;
-  return 'clases-pri/Clases_PRI_' + match[1] + match[2].toUpperCase() + '.htm';
+  const normalized = normalize_(value);
+  let match = normalized.match(/\b([1-6])\s*o?\s*([ab])\b/);
+  if (match && normalized.indexOf('primaria') !== -1) {
+    return 'clases-pri/Clases_PRI_' + match[1] + match[2].toUpperCase() + '.htm';
+  }
+  match = normalized.match(/\b([1-4])\s*o?\s*eso\s*([ab])\b/) || normalized.match(/\b([1-4])\s*o?\s*([ab])\s*eso\b/);
+  if (match) {
+    return 'clases-eso/Clases_ESO_' + match[1] + match[2].toUpperCase() + '.htm';
+  }
+  match = normalized.match(/\b([12])\s*o?\s*(?:bachillerato|bach|bac)\s*([ab])\b/) || normalized.match(/\b(?:bachillerato|bach|bac)\s*([12])\s*o?\s*([ab])\b/);
+  if (match) {
+    return 'clases-eso/Clases_BAC_' + match[1] + match[2].toUpperCase() + '.htm';
+  }
+  const classMatch = matchClass_(value);
+  return classMatch ? classMatch.path : null;
+}
+
+function matchClass_(name) {
+  const wanted = tokens_(name);
+  let best = null;
+  let bestScore = 0;
+  CLASS_TIMETABLES.forEach(([title, path]) => {
+    const available = tokens_(title);
+    const overlap = wanted.filter((token) => available.some((candidate) => tokenMatches_(token, candidate))).length;
+    const score = Math.max(overlap / Math.max(wanted.length, 1), overlap / Math.max(available.length, 1));
+    if (score > bestScore) {
+      bestScore = score;
+      best = { title, path };
+    }
+  });
+  return bestScore >= 0.75 ? best : null;
 }
 
 function createOrReplacePdf_(attachment) {
@@ -237,6 +318,12 @@ function normalize_(value) {
 
 function tokens_(value) {
   return normalize_(value).split(' ').filter((token) => token.length > 1);
+}
+
+function tokenMatches_(left, right) {
+  if (left === right) return true;
+  if (left.length < 3 || right.length < 3) return false;
+  return left.indexOf(right) === 0 || right.indexOf(left) === 0;
 }
 
 function safeName_(value) {
