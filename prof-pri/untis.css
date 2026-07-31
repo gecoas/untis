@@ -356,6 +356,28 @@ table[border="3"][rules="all"] tr:hover td:first-child {
     background: #dff0f7 !important;
 }
 
+/* Mantener los colores de leccion por encima de las filas alternas y hover. */
+table[border="3"][rules="all"] tr td.lesson-color-1 { background: #fde2e4 !important; }
+table[border="3"][rules="all"] tr td.lesson-color-2 { background: #fad2e1 !important; }
+table[border="3"][rules="all"] tr td.lesson-color-3 { background: #e2ece9 !important; }
+table[border="3"][rules="all"] tr td.lesson-color-4 { background: #bee1e6 !important; }
+table[border="3"][rules="all"] tr td.lesson-color-5 { background: #f0efeb !important; }
+table[border="3"][rules="all"] tr td.lesson-color-6 { background: #dfe7fd !important; }
+table[border="3"][rules="all"] tr td.lesson-color-7 { background: #cddafd !important; }
+table[border="3"][rules="all"] tr td.lesson-color-8 { background: #fff1c1 !important; }
+table[border="3"][rules="all"] tr td.lesson-color-9 { background: #d8f3dc !important; }
+table[border="3"][rules="all"] tr td.lesson-color-10 { background: #cdeac0 !important; }
+table[border="3"][rules="all"] tr td.lesson-color-11 { background: #ffdac1 !important; }
+table[border="3"][rules="all"] tr td.lesson-color-12 { background: #e7c6ff !important; }
+table[border="3"][rules="all"] tr td.lesson-color-13 { background: #c8e7ff !important; }
+table[border="3"][rules="all"] tr td.lesson-color-14 { background: #f6e6c2 !important; }
+table[border="3"][rules="all"] tr td.lesson-color-15 { background: #d0f4de !important; }
+table[border="3"][rules="all"] tr td.lesson-color-16 { background: #fcf6bd !important; }
+table[border="3"][rules="all"] tr td.lesson-color-17 { background: #f4d8cd !important; }
+table[border="3"][rules="all"] tr td.lesson-color-18 { background: #d6e2e9 !important; }
+table[border="3"][rules="all"] tr td.lesson-color-19 { background: #eadcf8 !important; }
+table[border="3"][rules="all"] tr td.lesson-color-20 { background: #cce3de !important; }
+
 /* Pie y navegacion */
 table[cellspacing="1"][cellpadding="1"]:not([border="3"]) {
     margin-top: 24px !important;
