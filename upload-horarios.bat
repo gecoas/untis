@@ -76,6 +76,14 @@ for %%d in (%FOLDERS%) do (
     )
 )
 
+echo Coloreando lecciones...
+powershell -NoProfile -ExecutionPolicy Bypass -File "%WORK_DIR%\scripts\color-lessons.ps1" -Root "%WORK_DIR%"
+if errorlevel 1 (
+    echo ERROR: No se pudieron colorear las lecciones.
+    pause
+    exit /b 1
+)
+
 cd /d "%WORK_DIR%"
 
 git add -A
