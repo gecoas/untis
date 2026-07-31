@@ -85,12 +85,16 @@ function doGet() {
 }
 
 function getRows() {
-  return readPeople_().map(buildRow_);
+  return {
+    rows: readPeople_().map(buildRow_),
+    professorOptions: PROFESSOR_TIMETABLES.map(([title, path]) => ({ title, path })),
+    classOptions: CLASS_TIMETABLES.map(([title, path]) => ({ title, path }))
+  };
 }
 
-function generatePreview(rowId) {
+function generatePreview(rowId, overrides) {
   const row = findRow_(rowId);
-  const attachments = buildAttachments_(row);
+  const attachments = buildAttachments_(row, overrides);
   if (!attachments.length) {
     throw new Error('No hay ningún horario asociado a ' + row.profesor);
   }
@@ -104,9 +108,9 @@ function generatePreview(rowId) {
   });
 }
 
-function sendRow(rowId) {
+function sendRow(rowId, overrides) {
   const row = findRow_(rowId);
-  const attachments = buildAttachments_(row);
+  const attachments = buildAttachments_(row, overrides);
   if (!attachments.length) {
     throw new Error('No hay ningún horario asociado a ' + row.profesor);
   }
@@ -123,17 +127,24 @@ function sendRow(rowId) {
   };
 }
 
-function sendSelected(rowIds) {
-  return rowIds.map((rowId) => sendRow(rowId));
+function sendSelected(items) {
+  return items.map((item) => sendRow(item.rowId, item.overrides));
 }
 
 function buildRow_(row) {
-  const attachments = buildAttachments_(row);
+  const professorMatch = matchProfessor_(row.profesor);
+  const classPath = classPathFromTutor_(row.tutorDe);
+  const attachments = buildAttachments_(row, {
+    professorPath: professorMatch ? professorMatch.path : '',
+    classPath: classPath || ''
+  });
   return {
     id: row.id,
     profesor: row.profesor,
     email: row.email,
     tutorDe: row.tutorDe,
+    selectedProfessorPath: professorMatch ? professorMatch.path : '',
+    selectedClassPath: classPath || '',
     attachments: attachments.map((attachment) => ({
       label: attachment.label,
       path: attachment.path,
@@ -180,18 +191,25 @@ function findRow_(rowId) {
   return row;
 }
 
-function buildAttachments_(row) {
+function buildAttachments_(row, overrides) {
+  overrides = overrides || {};
   const attachments = [];
-  const professorMatch = matchProfessor_(row.profesor);
-  if (professorMatch) {
+  const professorPath = Object.prototype.hasOwnProperty.call(overrides, 'professorPath')
+    ? overrides.professorPath
+    : (matchProfessor_(row.profesor) || {}).path;
+  if (professorPath) {
+    findProfessorOption_(professorPath);
     attachments.push({
       label: 'Horario profesor',
-      path: professorMatch.path,
+      path: professorPath,
       fileName: 'profesor-' + safeName_(row.profesor) + '.pdf'
     });
   }
-  const classPath = classPathFromTutor_(row.tutorDe);
+  const classPath = Object.prototype.hasOwnProperty.call(overrides, 'classPath')
+    ? overrides.classPath
+    : classPathFromTutor_(row.tutorDe);
   if (classPath) {
+    findClassOption_(classPath);
     attachments.push({
       label: 'Horario grupo tutor',
       path: classPath,
@@ -213,6 +231,22 @@ function buildWarnings_(row, attachments) {
     warnings.push('No se enviará nada');
   }
   return warnings;
+}
+
+function findProfessorOption_(path) {
+  const match = PROFESSOR_TIMETABLES.find((entry) => entry[1] === path);
+  if (!match) {
+    throw new Error('Archivo de profesor no permitido: ' + path);
+  }
+  return { title: match[0], path: match[1] };
+}
+
+function findClassOption_(path) {
+  const match = CLASS_TIMETABLES.find((entry) => entry[1] === path);
+  if (!match) {
+    throw new Error('Archivo de grupo no permitido: ' + path);
+  }
+  return { title: match[0], path: match[1] };
 }
 
 function matchProfessor_(name) {

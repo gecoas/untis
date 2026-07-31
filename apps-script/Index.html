@@ -95,6 +95,23 @@
       font-weight: 700;
       text-decoration: none;
     }
+
+    select {
+      width: 100%;
+      max-width: 260px;
+      margin: 3px 0 8px;
+      padding: 7px 8px;
+      border: 1px solid #b8cbd6;
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    label {
+      display: block;
+      color: #5c6b73;
+      font-size: 12px;
+      font-weight: 700;
+    }
   </style>
 </head>
 <body>
@@ -111,6 +128,8 @@
 
   <script>
     let rows = [];
+    let professorOptions = [];
+    let classOptions = [];
 
     function setStatus(message) {
       document.getElementById('status').textContent = message || '';
@@ -120,7 +139,9 @@
       setStatus('Cargando lista...');
       google.script.run
         .withSuccessHandler((data) => {
-          rows = data;
+          rows = data.rows;
+          professorOptions = data.professorOptions;
+          classOptions = data.classOptions;
           render();
           setStatus('Lista cargada: ' + rows.length + ' profesores.');
         })
@@ -131,22 +152,85 @@
     function render() {
       const html = [
         '<table>',
-        '<thead><tr><th></th><th>Profesor</th><th>Email</th><th>Tutoría</th><th>PDFs previstos</th><th>Previsualización</th><th>Acciones</th></tr></thead>',
+        '<thead><tr><th></th><th>Profesor</th><th>Email</th><th>Tutoría</th><th>Archivos a enviar</th><th>PDFs previstos</th><th>Previsualización</th><th>Acciones</th></tr></thead>',
         '<tbody>'
       ];
       rows.forEach((row) => {
+        const hasAttachments = selectedAttachments(row).length > 0;
         html.push('<tr>');
-        html.push('<td><input type="checkbox" value="' + escapeHtml(row.id) + '" ' + (row.attachments.length ? '' : 'disabled') + '></td>');
+        html.push('<td><input type="checkbox" value="' + escapeHtml(row.id) + '" ' + (hasAttachments ? '' : 'disabled') + '></td>');
         html.push('<td><strong>' + escapeHtml(row.profesor) + '</strong>' + warningsHtml(row) + '</td>');
         html.push('<td>' + escapeHtml(row.email) + '</td>');
         html.push('<td>' + escapeHtml(row.tutorDe || '') + '</td>');
-        html.push('<td>' + row.attachments.map((item) => escapeHtml(item.label + ': ' + item.fileName)).join('<br>') + '</td>');
+        html.push('<td>' + selectorsHtml(row) + '</td>');
+        html.push('<td id="planned-' + escapeHtml(row.id) + '">' + plannedAttachmentsHtml(row) + '</td>');
         html.push('<td class="attachments" id="preview-' + escapeHtml(row.id) + '"></td>');
-        html.push('<td><button class="secondary" onclick="previewRow(\'' + escapeJs(row.id) + '\')" ' + (row.attachments.length ? '' : 'disabled') + '>Generar/ver PDF</button> <button onclick="sendRow(\'' + escapeJs(row.id) + '\')" ' + (row.attachments.length ? '' : 'disabled') + '>Enviar</button></td>');
+        html.push('<td><button class="secondary" data-action="preview" data-row="' + escapeHtml(row.id) + '" onclick="previewRow(\'' + escapeJs(row.id) + '\')" ' + (hasAttachments ? '' : 'disabled') + '>Generar/ver PDF</button> <button data-action="send" data-row="' + escapeHtml(row.id) + '" onclick="sendRow(\'' + escapeJs(row.id) + '\')" ' + (hasAttachments ? '' : 'disabled') + '>Enviar</button></td>');
         html.push('</tr>');
       });
       html.push('</tbody></table>');
       document.getElementById('app').innerHTML = html.join('');
+    }
+
+    function selectorsHtml(row) {
+      return [
+        '<label for="professor-' + escapeHtml(row.id) + '">Horario profesor</label>',
+        '<select id="professor-' + escapeHtml(row.id) + '" onchange="selectionChanged(\'' + escapeJs(row.id) + '\')">',
+        '<option value="">No enviar horario de profesor</option>',
+        professorOptions.map((option) => optionHtml(option, row.selectedProfessorPath)).join(''),
+        '</select>',
+        '<label for="class-' + escapeHtml(row.id) + '">Horario grupo tutor</label>',
+        '<select id="class-' + escapeHtml(row.id) + '" onchange="selectionChanged(\'' + escapeJs(row.id) + '\')">',
+        '<option value="">No enviar horario de grupo</option>',
+        classOptions.map((option) => optionHtml(option, row.selectedClassPath)).join(''),
+        '</select>'
+      ].join('');
+    }
+
+    function optionHtml(option, selectedPath) {
+      return '<option value="' + escapeHtml(option.path) + '" ' + (option.path === selectedPath ? 'selected' : '') + '>' + escapeHtml(option.title) + '</option>';
+    }
+
+    function selectionChanged(rowId) {
+      const row = rowById(rowId);
+      const planned = document.getElementById('planned-' + rowId);
+      planned.innerHTML = plannedAttachmentsHtml(row);
+      document.getElementById('preview-' + rowId).innerHTML = '';
+      const hasAttachments = selectedAttachments(row).length > 0;
+      document.querySelector('input[type="checkbox"][value="' + cssEscape(rowId) + '"]').disabled = !hasAttachments;
+      document.querySelector('button[data-action="preview"][data-row="' + cssEscape(rowId) + '"]').disabled = !hasAttachments;
+      document.querySelector('button[data-action="send"][data-row="' + cssEscape(rowId) + '"]').disabled = !hasAttachments;
+    }
+
+    function plannedAttachmentsHtml(row) {
+      const attachments = selectedAttachments(row);
+      return attachments.length ? attachments.map((item) => escapeHtml(item.label + ': ' + item.fileName)).join('<br>') : '<span class="warning">No se enviará nada</span>';
+    }
+
+    function selectedAttachments(row) {
+      const overrides = currentOverrides(row.id);
+      const attachments = [];
+      if (overrides.professorPath) {
+        attachments.push({ label: 'Horario profesor', fileName: 'profesor-' + safeName(row.profesor) + '.pdf' });
+      }
+      if (overrides.classPath) {
+        attachments.push({ label: 'Horario grupo tutor', fileName: 'grupo-' + safeName(row.tutorDe || 'grupo') + '.pdf' });
+      }
+      return attachments;
+    }
+
+    function currentOverrides(rowId) {
+      const professor = document.getElementById('professor-' + rowId);
+      const classSelect = document.getElementById('class-' + rowId);
+      const row = rowById(rowId);
+      return {
+        professorPath: professor ? professor.value : row.selectedProfessorPath,
+        classPath: classSelect ? classSelect.value : row.selectedClassPath
+      };
+    }
+
+    function rowById(rowId) {
+      return rows.find((row) => row.id === String(rowId));
     }
 
     function warningsHtml(row) {
@@ -163,7 +247,7 @@
           setStatus('PDF generado. Revísalo antes de enviar.');
         })
         .withFailureHandler(showError)
-        .generatePreview(rowId);
+        .generatePreview(rowId, currentOverrides(rowId));
     }
 
     function sendRow(rowId) {
@@ -172,21 +256,24 @@
       google.script.run
         .withSuccessHandler((result) => setStatus('Enviado a ' + result.email + ': ' + result.attachments.join(', ')))
         .withFailureHandler(showError)
-        .sendRow(rowId);
+        .sendRow(rowId, currentOverrides(rowId));
     }
 
     function sendSelectedRows() {
-      const ids = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map((input) => input.value);
-      if (!ids.length) {
+      const items = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map((input) => ({
+        rowId: input.value,
+        overrides: currentOverrides(input.value)
+      }));
+      if (!items.length) {
         alert('Selecciona al menos un profesor.');
         return;
       }
-      if (!confirm('¿Enviar los PDF a ' + ids.length + ' profesores?')) return;
+      if (!confirm('¿Enviar los PDF a ' + items.length + ' profesores?')) return;
       setStatus('Enviando seleccionados...');
       google.script.run
         .withSuccessHandler((results) => setStatus('Envíos completados: ' + results.length))
         .withFailureHandler(showError)
-        .sendSelected(ids);
+        .sendSelected(items);
     }
 
     function showError(error) {
@@ -199,6 +286,14 @@
 
     function escapeJs(value) {
       return String(value || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    }
+
+    function cssEscape(value) {
+      return String(value || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+    }
+
+    function safeName(value) {
+      return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-|-$/g, '').toLowerCase() || 'horario';
     }
 
     loadRows();
