@@ -9,6 +9,12 @@ $utf8Strict = New-Object System.Text.UTF8Encoding -ArgumentList $false, $true
 $utf8NoBom = New-Object System.Text.UTF8Encoding -ArgumentList $false
 $win1252 = [System.Text.Encoding]::GetEncoding(1252)
 $codes = 0x00E1,0x00E9,0x00ED,0x00F3,0x00FA,0x00C1,0x00C9,0x00CD,0x00D3,0x00DA,0x00F1,0x00D1,0x00FC,0x00DC,0x00BA,0x00AA
+$degree = [string][char]0x00BA
+$ordinal = [string][char]0x00AA
+$badDegreeLong = ([string][char]0x00C3) + ([string][char]0x201A) + $degree
+$badOrdinalLong = ([string][char]0x00C3) + ([string][char]0x201A) + $ordinal
+$badDegreeShort = ([string][char]0x00C2) + $degree
+$badOrdinalShort = ([string][char]0x00C2) + $ordinal
 
 if (-not (Test-Path $Folder)) {
     throw "No existe la carpeta: $Folder"
@@ -33,7 +39,7 @@ Get-ChildItem $Folder -Filter '*.htm' | ForEach-Object {
     }
 
     $content = $content -replace 'charset=iso-8859-1', 'charset=utf-8'
-    $content = $content.Replace('Ã‚º', 'º').Replace('Ã‚ª', 'ª').Replace('Âº', 'º').Replace('Âª', 'ª')
+    $content = $content.Replace($badDegreeLong, $degree).Replace($badOrdinalLong, $ordinal).Replace($badDegreeShort, $degree).Replace($badOrdinalShort, $ordinal)
     foreach ($code in $codes) {
         $good = [string][char]$code
         $bad = $good
