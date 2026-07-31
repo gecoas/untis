@@ -24,6 +24,23 @@
       flex-wrap: wrap;
     }
 
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin: 8px 0 14px;
+      flex-wrap: wrap;
+    }
+
+    .tab {
+      color: #0b4f71;
+      background: #e8f4f8;
+    }
+
+    .tab.active {
+      color: #fff;
+      background: #0b4f71;
+    }
+
     button {
       padding: 10px 14px;
       color: #fff;
@@ -130,6 +147,7 @@
     let rows = [];
     let professorOptions = [];
     let classOptions = [];
+    let activeSheet = 'Primaria';
 
     function setStatus(message) {
       document.getElementById('status').textContent = message || '';
@@ -142,6 +160,9 @@
           rows = data.rows;
           professorOptions = data.professorOptions;
           classOptions = data.classOptions;
+          if (!rows.some((row) => row.sheetName === activeSheet)) {
+            activeSheet = sheetNames()[0] || 'Primaria';
+          }
           render();
           setStatus('Lista cargada: ' + rows.length + ' profesores.');
         })
@@ -150,12 +171,14 @@
     }
 
     function render() {
+      const visibleRows = rows.filter((row) => row.sheetName === activeSheet);
       const html = [
+        tabsHtml(),
         '<table>',
         '<thead><tr><th></th><th>Profesor</th><th>Email</th><th>Tutoría</th><th>Archivos a enviar</th><th>PDFs previstos</th><th>Previsualización</th><th>Acciones</th></tr></thead>',
         '<tbody>'
       ];
-      rows.forEach((row) => {
+      visibleRows.forEach((row) => {
         const hasAttachments = selectedAttachments(row).length > 0;
         html.push('<tr>');
         html.push('<td><input type="checkbox" value="' + escapeHtml(row.id) + '" ' + (hasAttachments ? '' : 'disabled') + '></td>');
@@ -170,6 +193,28 @@
       });
       html.push('</tbody></table>');
       document.getElementById('app').innerHTML = html.join('');
+    }
+
+    function tabsHtml() {
+      return '<div class="tabs">' + sheetNames().map((sheetName) => {
+        const count = rows.filter((row) => row.sheetName === sheetName).length;
+        const active = sheetName === activeSheet ? ' active' : '';
+        return '<button class="tab' + active + '" onclick="setActiveSheet(\'' + escapeJs(sheetName) + '\')">' + escapeHtml(sheetName + ' (' + count + ')') + '</button>';
+      }).join('') + '</div>';
+    }
+
+    function sheetNames() {
+      const names = [];
+      rows.forEach((row) => {
+        if (names.indexOf(row.sheetName) === -1) names.push(row.sheetName);
+      });
+      return names;
+    }
+
+    function setActiveSheet(sheetName) {
+      activeSheet = sheetName;
+      render();
+      setStatus('Mostrando ' + sheetName + '.');
     }
 
     function selectorsHtml(row) {
@@ -193,6 +238,9 @@
 
     function selectionChanged(rowId) {
       const row = rowById(rowId);
+      const overrides = currentOverrides(rowId);
+      row.selectedProfessorPath = overrides.professorPath;
+      row.selectedClassPath = overrides.classPath;
       const planned = document.getElementById('planned-' + rowId);
       planned.innerHTML = plannedAttachmentsHtml(row);
       document.getElementById('preview-' + rowId).innerHTML = '';

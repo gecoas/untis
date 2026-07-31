@@ -5,6 +5,7 @@ Este flujo usa Google Apps Script para generar PDFs desde la web publicada y env
 ## Qué hace
 
 - Muestra una web privada con la lista de profesores.
+- Separa los profesores en dos pestañas: `Primaria` y `ESO/Bach`.
 - Para cada profesor muestra los PDFs previstos.
 - Permite generar y abrir el PDF para comprobarlo antes de enviar.
 - Envía el PDF del profesor por Gmail.

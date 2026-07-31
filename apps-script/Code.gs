@@ -140,6 +140,7 @@ function buildRow_(row) {
   });
   return {
     id: row.id,
+    sheetName: row.sheetName,
     profesor: row.profesor,
     email: row.email,
     tutorDe: row.tutorDe,
@@ -188,6 +189,7 @@ function readPeopleFromSheet_(spreadsheet, sheetName) {
   return values
     .map((line, index) => ({
       id: sheetName + '!' + String(index + 2),
+      sheetName,
       profesor: String(line[idxProfesor] || '').trim(),
       email: String(line[idxEmail] || '').trim(),
       tutorDe: String(line[idxTutor] || '').trim()
