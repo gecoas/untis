@@ -132,8 +132,8 @@ function sendSelected(items) {
 }
 
 function buildRow_(row) {
-  const professorMatch = matchProfessor_(row.profesor);
-  const classPath = classPathFromTutor_(row.tutorDe);
+  const professorMatch = matchProfessor_(row.profesor, row.sheetName);
+  const classPath = classPathFromTutor_(row.tutorDe, row.sheetName);
   const attachments = buildAttachments_(row, {
     professorPath: professorMatch ? professorMatch.path : '',
     classPath: classPath || ''
@@ -210,7 +210,7 @@ function buildAttachments_(row, overrides) {
   const attachments = [];
   const professorPath = Object.prototype.hasOwnProperty.call(overrides, 'professorPath')
     ? overrides.professorPath
-    : (matchProfessor_(row.profesor) || {}).path;
+    : (matchProfessor_(row.profesor, row.sheetName) || {}).path;
   if (professorPath) {
     findProfessorOption_(professorPath);
     attachments.push({
@@ -221,7 +221,7 @@ function buildAttachments_(row, overrides) {
   }
   const classPath = Object.prototype.hasOwnProperty.call(overrides, 'classPath')
     ? overrides.classPath
-    : classPathFromTutor_(row.tutorDe);
+    : classPathFromTutor_(row.tutorDe, row.sheetName);
   if (classPath) {
     findClassOption_(classPath);
     attachments.push({
@@ -235,10 +235,10 @@ function buildAttachments_(row, overrides) {
 
 function buildWarnings_(row, attachments) {
   const warnings = [];
-  if (!matchProfessor_(row.profesor)) {
+  if (!matchProfessor_(row.profesor, row.sheetName)) {
     warnings.push('No se ha encontrado horario de profesor');
   }
-  if (row.tutorDe && !classPathFromTutor_(row.tutorDe)) {
+  if (row.tutorDe && !classPathFromTutor_(row.tutorDe, row.sheetName)) {
     warnings.push('No se ha encontrado horario del grupo tutor');
   }
   if (!attachments.length) {
@@ -263,11 +263,11 @@ function findClassOption_(path) {
   return { title: match[0], path: match[1] };
 }
 
-function matchProfessor_(name) {
+function matchProfessor_(name, sheetName) {
   const wanted = tokens_(name);
   let best = null;
   let bestScore = 0;
-  PROFESSOR_TIMETABLES.forEach(([title, path]) => {
+  filterTimetablesForSheet_(PROFESSOR_TIMETABLES, sheetName).forEach(([title, path]) => {
     const available = tokens_(title);
     const overlap = wanted.filter((token) => available.some((candidate) => tokenMatches_(token, candidate))).length;
     const score = Math.max(overlap / Math.max(wanted.length, 1), overlap / Math.max(available.length, 1));
@@ -279,30 +279,30 @@ function matchProfessor_(name) {
   return bestScore >= 0.75 ? best : null;
 }
 
-function classPathFromTutor_(value) {
+function classPathFromTutor_(value, sheetName) {
   if (!value) return null;
   const normalized = normalize_(value);
   let match = normalized.match(/\b([1-6])\s*o?\s*([ab])\b/);
-  if (match && normalized.indexOf('primaria') !== -1) {
+  if (match && normalized.indexOf('primaria') !== -1 && isPrimarySheet_(sheetName)) {
     return 'clases-pri/Clases_PRI_' + match[1] + match[2].toUpperCase() + '.htm';
   }
   match = normalized.match(/\b([1-4])\s*o?\s*eso\s*([ab])\b/) || normalized.match(/\b([1-4])\s*o?\s*([ab])\s*eso\b/);
-  if (match) {
+  if (match && isSecondarySheet_(sheetName)) {
     return 'clases-eso/Clases_ESO_' + match[1] + match[2].toUpperCase() + '.htm';
   }
   match = normalized.match(/\b([12])\s*o?\s*(?:bachillerato|bach|bac)\s*([ab])\b/) || normalized.match(/\b(?:bachillerato|bach|bac)\s*([12])\s*o?\s*([ab])\b/);
-  if (match) {
+  if (match && isSecondarySheet_(sheetName)) {
     return 'clases-eso/Clases_BAC_' + match[1] + match[2].toUpperCase() + '.htm';
   }
-  const classMatch = matchClass_(value);
+  const classMatch = matchClass_(value, sheetName);
   return classMatch ? classMatch.path : null;
 }
 
-function matchClass_(name) {
+function matchClass_(name, sheetName) {
   const wanted = tokens_(name);
   let best = null;
   let bestScore = 0;
-  CLASS_TIMETABLES.forEach(([title, path]) => {
+  filterTimetablesForSheet_(CLASS_TIMETABLES, sheetName).forEach(([title, path]) => {
     const available = tokens_(title);
     const overlap = wanted.filter((token) => available.some((candidate) => tokenMatches_(token, candidate))).length;
     const score = Math.max(overlap / Math.max(wanted.length, 1), overlap / Math.max(available.length, 1));
@@ -312,6 +312,25 @@ function matchClass_(name) {
     }
   });
   return bestScore >= 0.75 ? best : null;
+}
+
+function filterTimetablesForSheet_(timetables, sheetName) {
+  if (isPrimarySheet_(sheetName)) {
+    return timetables.filter((entry) => entry[1].indexOf('-pri/') !== -1);
+  }
+  if (isSecondarySheet_(sheetName)) {
+    return timetables.filter((entry) => entry[1].indexOf('-eso/') !== -1);
+  }
+  return timetables;
+}
+
+function isPrimarySheet_(sheetName) {
+  return normalize_(sheetName).indexOf('primaria') !== -1;
+}
+
+function isSecondarySheet_(sheetName) {
+  const normalized = normalize_(sheetName);
+  return normalized.indexOf('eso') !== -1 || normalized.indexOf('bach') !== -1;
 }
 
 function createOrReplacePdf_(attachment) {

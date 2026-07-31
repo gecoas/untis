@@ -222,14 +222,33 @@
         '<label for="professor-' + escapeHtml(row.id) + '">Horario profesor</label>',
         '<select id="professor-' + escapeHtml(row.id) + '" onchange="selectionChanged(\'' + escapeJs(row.id) + '\')">',
         '<option value="">No enviar horario de profesor</option>',
-        professorOptions.map((option) => optionHtml(option, row.selectedProfessorPath)).join(''),
+        optionsForSheet(professorOptions, row.sheetName).map((option) => optionHtml(option, row.selectedProfessorPath)).join(''),
         '</select>',
         '<label for="class-' + escapeHtml(row.id) + '">Horario grupo tutor</label>',
         '<select id="class-' + escapeHtml(row.id) + '" onchange="selectionChanged(\'' + escapeJs(row.id) + '\')">',
         '<option value="">No enviar horario de grupo</option>',
-        classOptions.map((option) => optionHtml(option, row.selectedClassPath)).join(''),
+        optionsForSheet(classOptions, row.sheetName).map((option) => optionHtml(option, row.selectedClassPath)).join(''),
         '</select>'
       ].join('');
+    }
+
+    function optionsForSheet(options, sheetName) {
+      if (isPrimarySheet(sheetName)) {
+        return options.filter((option) => option.path.indexOf('-pri/') !== -1);
+      }
+      if (isSecondarySheet(sheetName)) {
+        return options.filter((option) => option.path.indexOf('-eso/') !== -1);
+      }
+      return options;
+    }
+
+    function isPrimarySheet(sheetName) {
+      return normalize(sheetName).indexOf('primaria') !== -1;
+    }
+
+    function isSecondarySheet(sheetName) {
+      const value = normalize(sheetName);
+      return value.indexOf('eso') !== -1 || value.indexOf('bach') !== -1;
     }
 
     function optionHtml(option, selectedPath) {
@@ -342,6 +361,10 @@
 
     function safeName(value) {
       return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-|-$/g, '').toLowerCase() || 'horario';
+    }
+
+    function normalize(value) {
+      return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
     }
 
     loadRows();
