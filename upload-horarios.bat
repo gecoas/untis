@@ -10,6 +10,9 @@ set "ROOT=%~dp0"
 set "WORK_DIR=%TEMP%\untis-upload-repo"
 set "FOLDERS=clases-pri prof-pri clases-eso prof-eso"
 set "COMMIT_MSG=Subir horarios Untis"
+set "LOG=%ROOT%upload-horarios.log"
+
+echo Inicio %DATE% %TIME% > "%LOG%"
 
 where git >nul 2>nul
 if errorlevel 1 (
@@ -44,6 +47,7 @@ if exist "%WORK_DIR%\" (
 )
 
 echo Clonando repositorio...
+echo Clonando repositorio... >> "%LOG%"
 git clone "%REPO_URL%" "%WORK_DIR%"
 if errorlevel 1 (
     echo ERROR: No se pudo clonar el repositorio.
@@ -77,9 +81,11 @@ for %%d in (%FOLDERS%) do (
 )
 
 echo Coloreando lecciones...
-powershell -NoProfile -ExecutionPolicy Bypass -File "%WORK_DIR%\scripts\color-lessons.ps1" -Root "%WORK_DIR%"
+echo Coloreando lecciones... >> "%LOG%"
+powershell -NoProfile -ExecutionPolicy Bypass -File "%WORK_DIR%\scripts\color-lessons.ps1" -Root "%WORK_DIR%" >> "%LOG%" 2>&1
 if errorlevel 1 (
     echo ERROR: No se pudieron colorear las lecciones.
+    echo Revisa el log: %LOG%
     pause
     exit /b 1
 )
