@@ -11,6 +11,7 @@ const PROFESSOR_TIMETABLES = [
   ['Bailly-Bailliere Torres-Pardo Gabriel', 'prof-pri/Profesores_Gabriel_BB.htm'],
   ['Bello Glenda', 'prof-pri/Profesores_Glen.htm'],
   ['García Corral Gonzalo', 'prof-pri/Profesores_Gonz.htm'],
+  ['Borraz Viver Inmaculada', 'prof-pri/Profesores_Inma.htm'],
   ['Iñigo Romera Iñigo Alberto', 'prof-pri/Profesores_If1ig.htm'],
   ['Fernández Castiella Juan Pablo', 'prof-pri/Profesores_Jua2.htm'],
   ['Palacios Herce Laura', 'prof-pri/Profesores_Lau4.htm'],
