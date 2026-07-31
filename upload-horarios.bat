@@ -14,10 +14,19 @@ set "LOG=%ROOT%upload-horarios.log"
 
 echo Inicio %DATE% %TIME% > "%LOG%"
 
-where git >nul 2>nul
+where git >> "%LOG%" 2>&1
 if errorlevel 1 (
     echo ERROR: Git no esta instalado o no esta en el PATH.
     echo Instala Git for Windows: https://git-scm.com/download/win
+    echo ERROR: Git no esta instalado o no esta en el PATH. >> "%LOG%"
+    pause
+    exit /b 1
+)
+
+where powershell >> "%LOG%" 2>&1
+if errorlevel 1 (
+    echo ERROR: PowerShell no esta disponible.
+    echo ERROR: PowerShell no esta disponible. >> "%LOG%"
     pause
     exit /b 1
 )
@@ -26,11 +35,13 @@ set "MISSING=0"
 for %%d in (%FOLDERS%) do (
     if not exist "%ROOT%%%d\" (
         echo ERROR: No existe la carpeta %%d junto a este .bat.
+        echo ERROR: No existe la carpeta %%d junto a este .bat. >> "%LOG%"
         set "MISSING=1"
     ) else (
         dir "%ROOT%%%d\*.htm" /b >nul 2>nul
         if errorlevel 1 (
             echo ERROR: La carpeta %%d no contiene archivos .htm.
+            echo ERROR: La carpeta %%d no contiene archivos .htm. >> "%LOG%"
             set "MISSING=1"
         )
     )
@@ -43,40 +54,48 @@ if "%MISSING%"=="1" (
 )
 
 if exist "%WORK_DIR%\" (
-    rmdir /s /q "%WORK_DIR%"
+    echo Eliminando carpeta temporal... >> "%LOG%"
+    rmdir /s /q "%WORK_DIR%" >> "%LOG%" 2>&1
 )
 
 echo Clonando repositorio...
 echo Clonando repositorio... >> "%LOG%"
-git clone "%REPO_URL%" "%WORK_DIR%"
+git clone "%REPO_URL%" "%WORK_DIR%" >> "%LOG%" 2>&1
 if errorlevel 1 (
     echo ERROR: No se pudo clonar el repositorio.
     echo Comprueba que tienes acceso a GitHub y que Git esta autenticado.
+    echo Revisa el log: %LOG%
     pause
     exit /b 1
 )
 
 for %%d in (%FOLDERS%) do (
-    if exist "%ROOT%%%d\" (
-        echo Copiando %%d...
-        if exist "%WORK_DIR%\%%d\" rmdir /s /q "%WORK_DIR%\%%d"
-        mkdir "%WORK_DIR%\%%d" >nul 2>nul
-        robocopy "%ROOT%%%d" "%WORK_DIR%\%%d" /E /XD .git /XF Thumbs.db Desktop.ini >nul
-        if errorlevel 8 (
-            echo ERROR: Fallo al copiar %%d.
-            pause
-            exit /b 1
-        )
-        copy /y "%WORK_DIR%\untis.css" "%WORK_DIR%\%%d\untis.css" >nul
-        echo Preparando %%d...
-        powershell -NoProfile -ExecutionPolicy Bypass -Command "$utf8Strict = New-Object System.Text.UTF8Encoding -ArgumentList $false, $true; $utf8NoBom = New-Object System.Text.UTF8Encoding -ArgumentList $false; $win1252 = [System.Text.Encoding]::GetEncoding(1252); $codes = 0x00E1,0x00E9,0x00ED,0x00F3,0x00FA,0x00C1,0x00C9,0x00CD,0x00D3,0x00DA,0x00F1,0x00D1,0x00FC,0x00DC,0x00BA,0x00AA; Get-ChildItem '%WORK_DIR%\%%d\*.htm' | ForEach-Object { $bytes = [System.IO.File]::ReadAllBytes($_.FullName); try { $c = $utf8Strict.GetString($bytes) } catch { $c = [System.Text.Encoding]::Default.GetString($bytes) }; if (-not $c.Contains('untis.css')) { $c = $c.Replace('</head>', '<link rel=' + [char]34 + 'stylesheet' + [char]34 + ' type=' + [char]34 + 'text/css' + [char]34 + ' href=' + [char]34 + 'untis.css' + [char]34 + '>' + [Environment]::NewLine + '</head>') }; if (($_.BaseName -eq 'Clases' -or $_.BaseName -eq 'Profesores') -and (-not $c.Contains('home-link'))) { $c = $c -replace '<CENTER>', '<CENTER><div class=''home-link-wrap''><a class=''home-link'' href=''../index.html''>&#8592; Volver al inicio</a></div>' }; $c = $c -replace 'charset=iso-8859-1', 'charset=utf-8'; $c = $c.Replace('Ã‚º', 'º').Replace('Ã‚ª', 'ª').Replace('Âº', 'º').Replace('Âª', 'ª'); foreach ($code in $codes) { $good = [string][char]$code; $bad = $good; 1..3 | ForEach-Object { $bad = $win1252.GetString([System.Text.Encoding]::UTF8.GetBytes($bad)); $c = $c.Replace($bad, $good) } }; $c = $c -replace '<img\s+src=\"GpPrev\.gif\"[^>]*>', '<span class=\"nav-icon nav-prev\">&#8592;</span>'; $c = $c -replace '<img\s+src=\"GpIndex\.gif\"[^>]*>', '<span class=\"nav-icon nav-home\">&#127968;</span>'; $c = $c -replace '<img\s+src=\"GpNext\.gif\"[^>]*>', '<span class=\"nav-icon nav-next\">&#8594;</span>'; if ($_.BaseName -ne 'Clases' -and $_.BaseName -ne 'Profesores' -and $c.Contains('nav-icon') -and -not $c.Contains('top-nav')) { $navLinks = [regex]::Matches($c, '<A HREF="[^"]+"><span class="nav-icon [^"]+">.*?</span></A>'); if ($navLinks.Count -gt 0) { $navHtml = '<div class="top-nav">' + (($navLinks | ForEach-Object { $_.Value }) -join '') + '</div>'; $c = [regex]::Replace($c, '(</font>\s*)<BR><TABLE border="3"', '$1' + $navHtml + '<BR><TABLE border="3"', 1) } }; if ($_.BaseName -ne 'Clases' -and $_.BaseName -ne 'Profesores' -and $c.Contains('top-nav') -and -not $c.Contains('print-actions')) { $printHtml = '<div class="print-actions"><button type="button" class="print-action" onclick="window.print()">Descargar PDF</button><button type="button" class="print-action" onclick="window.print()">Imprimir</button></div>'; $c = $c.Replace('</div><BR><TABLE border="3"', '</div>' + $printHtml + '<BR><TABLE border="3"') }; [System.IO.File]::WriteAllText($_.FullName, $c, $utf8NoBom) }"
-        if errorlevel 1 (
-            echo ERROR: No se pudo preparar %%d.
-            pause
-            exit /b 1
-        )
-    ) else (
-        echo Aviso: no existe %%d, se omite.
+    echo Copiando %%d...
+    echo Copiando %%d... >> "%LOG%"
+    if exist "%WORK_DIR%\%%d\" rmdir /s /q "%WORK_DIR%\%%d" >> "%LOG%" 2>&1
+    mkdir "%WORK_DIR%\%%d" >> "%LOG%" 2>&1
+    robocopy "%ROOT%%%d" "%WORK_DIR%\%%d" /E /XD .git /XF Thumbs.db Desktop.ini >> "%LOG%" 2>&1
+    if errorlevel 8 (
+        echo ERROR: Fallo al copiar %%d.
+        echo Revisa el log: %LOG%
+        pause
+        exit /b 1
+    )
+    copy /y "%WORK_DIR%\untis.css" "%WORK_DIR%\%%d\untis.css" >> "%LOG%" 2>&1
+    if errorlevel 1 (
+        echo ERROR: No se pudo copiar untis.css en %%d.
+        echo Revisa el log: %LOG%
+        pause
+        exit /b 1
+    )
+    echo Preparando %%d...
+    echo Preparando %%d... >> "%LOG%"
+    powershell -NoProfile -ExecutionPolicy Bypass -File "%WORK_DIR%\scripts\prepare-horarios.ps1" -Folder "%WORK_DIR%\%%d" >> "%LOG%" 2>&1
+    if errorlevel 1 (
+        echo ERROR: No se pudo preparar %%d.
+        echo Revisa el log: %LOG%
+        pause
+        exit /b 1
     )
 )
 
@@ -92,31 +111,37 @@ if errorlevel 1 (
 
 cd /d "%WORK_DIR%"
 
-git add -A
+git add -A >> "%LOG%" 2>&1
 git diff --cached --quiet
 if not errorlevel 1 (
     echo No hay cambios nuevos que subir.
+    echo No hay cambios nuevos que subir. >> "%LOG%"
     pause
     exit /b 0
 )
 
 echo Creando commit...
-git commit -m "%COMMIT_MSG%"
+echo Creando commit... >> "%LOG%"
+git commit -m "%COMMIT_MSG%" >> "%LOG%" 2>&1
 if errorlevel 1 (
     echo ERROR: No se pudo crear el commit.
+    echo Revisa el log: %LOG%
     pause
     exit /b 1
 )
 
 echo Subiendo a GitHub...
-git push origin main
+echo Subiendo a GitHub... >> "%LOG%"
+git push origin main >> "%LOG%" 2>&1
 if errorlevel 1 (
     echo ERROR: No se pudo hacer push.
     echo Comprueba tu autenticacion de GitHub en Windows.
+    echo Revisa el log: %LOG%
     pause
     exit /b 1
 )
 
+echo Fin %DATE% %TIME% >> "%LOG%"
 echo.
 echo Horarios subidos correctamente a GitHub.
 pause
