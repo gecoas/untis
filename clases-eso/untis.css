@@ -340,14 +340,6 @@ table[border="3"][rules="all"] i {
     line-height: 1.35 !important;
 }
 
-table[border="3"][rules="all"] tr:nth-child(even) td {
-    background: #fbfdfe !important;
-}
-
-table[border="3"][rules="all"] tr:nth-child(even) td:first-child {
-    background: var(--blue-100) !important;
-}
-
 /* Mantener los colores de leccion por encima de las filas alternas. */
 table[border="3"][rules="all"] tr td.lesson-color-1 { background: #fde2e4 !important; }
 table[border="3"][rules="all"] tr td.lesson-color-2 { background: #fad2e1 !important; }
