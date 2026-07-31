@@ -12,13 +12,18 @@ Este flujo usa Google Apps Script para generar PDFs desde la web publicada y env
 
 ## Preparar Google Sheet
 
-Crea una hoja de cálculo privada con una pestaña llamada `Primaria` y estas columnas exactas:
+Crea una hoja de cálculo privada con dos pestañas:
+
+- `Primaria`
+- `ESO/Bach`
+
+Cada pestaña debe tener estas columnas exactas:
 
 ```text
 Profesor | email | Tutor de Grupo
 ```
 
-Pega ahí la lista completa de profesores. Puede incluir profesores de Primaria, ESO y Bachillerato. No se sube a GitHub.
+Pega en cada pestaña los profesores correspondientes. No se sube a GitHub.
 
 El campo `Tutor de Grupo` acepta valores como:
 
@@ -44,7 +49,6 @@ En `Configuración del proyecto` añade estas propiedades:
 
 ```text
 SHEET_ID = ID de la hoja de cálculo
-SHEET_NAME = Primaria
 SITE_BASE_URL = https://gecoas.github.io/untis
 ```
 
@@ -52,7 +56,10 @@ Opcional:
 
 ```text
 PDF_FOLDER_ID = ID de una carpeta de Drive donde guardar los PDFs
+SHEET_NAMES = Primaria,ESO/Bach
 ```
+
+Si no pones `SHEET_NAMES`, el script lee automáticamente `Primaria` y `ESO/Bach`.
 
 Si no pones `PDF_FOLDER_ID`, el script crea o usa una carpeta llamada `Horarios Untis PDF`.
 

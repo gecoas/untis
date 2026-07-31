@@ -1,5 +1,5 @@
 const DEFAULT_SITE_BASE_URL = 'https://gecoas.github.io/untis';
-const DEFAULT_SHEET_NAME = 'Primaria';
+const DEFAULT_SHEET_NAMES = ['Primaria', 'ESO/Bach'];
 
 const PROFESSOR_TIMETABLES = [
   ['González Alonso Adrián', 'prof-pri/Profesores_Adri.htm'],
@@ -160,8 +160,20 @@ function readPeople_() {
   if (!sheetId) {
     throw new Error('Falta Script Property SHEET_ID');
   }
-  const sheetName = props.getProperty('SHEET_NAME') || DEFAULT_SHEET_NAME;
-  const sheet = SpreadsheetApp.openById(sheetId).getSheetByName(sheetName);
+  const spreadsheet = SpreadsheetApp.openById(sheetId);
+  return getSheetNames_().flatMap((sheetName) => readPeopleFromSheet_(spreadsheet, sheetName));
+}
+
+function getSheetNames_() {
+  const value = PropertiesService.getScriptProperties().getProperty('SHEET_NAMES');
+  if (!value) {
+    return DEFAULT_SHEET_NAMES;
+  }
+  return value.split(',').map((name) => name.trim()).filter(Boolean);
+}
+
+function readPeopleFromSheet_(spreadsheet, sheetName) {
+  const sheet = spreadsheet.getSheetByName(sheetName);
   if (!sheet) {
     throw new Error('No existe la hoja: ' + sheetName);
   }
@@ -175,7 +187,7 @@ function readPeople_() {
   }
   return values
     .map((line, index) => ({
-      id: String(index + 2),
+      id: sheetName + '!' + String(index + 2),
       profesor: String(line[idxProfesor] || '').trim(),
       email: String(line[idxEmail] || '').trim(),
       tutorDe: String(line[idxTutor] || '').trim()
