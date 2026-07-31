@@ -1,5 +1,6 @@
 const DEFAULT_SITE_BASE_URL = 'https://gecoas.github.io/untis';
 const DEFAULT_SHEET_NAMES = ['Primaria', 'ESO/Bach'];
+const DEFAULT_EMAIL_BODY = 'Adjunto se envían los horarios correspondientes al curso 2026-2027.\n\nUn saludo.';
 
 const PROFESSOR_TIMETABLES = [
   ['González Alonso Adrián', 'prof-pri/Profesores_Adri.htm'],
@@ -109,7 +110,7 @@ function generatePreview(rowId, overrides) {
   });
 }
 
-function sendRow(rowId, overrides) {
+function sendRow(rowId, overrides, emailBody) {
   const row = findRow_(rowId);
   const attachments = buildAttachments_(row, overrides);
   if (!attachments.length) {
@@ -119,7 +120,7 @@ function sendRow(rowId, overrides) {
   GmailApp.sendEmail(
     row.email,
     'Horarios curso 2026-2027',
-    'Adjunto se envían los horarios correspondientes al curso 2026-2027.\n\nUn saludo.',
+    normalizeEmailBody_(emailBody),
     { attachments: pdfBlobs }
   );
   return {
@@ -128,8 +129,16 @@ function sendRow(rowId, overrides) {
   };
 }
 
-function sendSelected(items) {
-  return items.map((item) => sendRow(item.rowId, item.overrides));
+function sendSelected(items, emailBody) {
+  return items.map((item) => sendRow(item.rowId, item.overrides, emailBody));
+}
+
+function normalizeEmailBody_(emailBody) {
+  const body = String(emailBody || DEFAULT_EMAIL_BODY).trim();
+  if (!body) {
+    throw new Error('El cuerpo del correo no puede estar vacío');
+  }
+  return body;
 }
 
 function buildRow_(row) {

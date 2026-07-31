@@ -113,6 +113,28 @@
       text-decoration: none;
     }
 
+    .email-body-box {
+      margin: 18px 0;
+      padding: 16px;
+      background: #fff;
+      border: 1px solid #d8e3ea;
+      border-radius: 14px;
+      box-shadow: 0 8px 22px rgba(7, 58, 85, 0.08);
+    }
+
+    .email-body-box textarea {
+      width: 100%;
+      min-height: 120px;
+      margin-top: 8px;
+      padding: 10px 12px;
+      border: 1px solid #b8cbd6;
+      border-radius: 10px;
+      box-sizing: border-box;
+      color: #1f2933;
+      font: 14px Arial, Helvetica, sans-serif;
+      resize: vertical;
+    }
+
     select {
       width: 100%;
       max-width: 260px;
@@ -140,6 +162,13 @@
     <button onclick="sendSelectedRows()">Enviar seleccionados</button>
   </div>
 
+  <div class="email-body-box">
+    <label for="email-body">Texto del correo</label>
+    <textarea id="email-body">Adjunto se envían los horarios correspondientes al curso 2026-2027.
+
+Un saludo.</textarea>
+  </div>
+
   <div id="status" class="status"></div>
   <div id="app"></div>
 
@@ -151,6 +180,10 @@
 
     function setStatus(message) {
       document.getElementById('status').textContent = message || '';
+    }
+
+    function currentEmailBody() {
+      return document.getElementById('email-body').value;
     }
 
     function loadRows() {
@@ -323,7 +356,7 @@
       google.script.run
         .withSuccessHandler((result) => setStatus('Enviado a ' + result.email + ': ' + result.attachments.join(', ')))
         .withFailureHandler(showError)
-        .sendRow(rowId, currentOverrides(rowId));
+        .sendRow(rowId, currentOverrides(rowId), currentEmailBody());
     }
 
     function sendSelectedRows() {
@@ -340,7 +373,7 @@
       google.script.run
         .withSuccessHandler((results) => setStatus('Envíos completados: ' + results.length))
         .withFailureHandler(showError)
-        .sendSelected(items);
+        .sendSelected(items, currentEmailBody());
     }
 
     function showError(error) {

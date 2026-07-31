@@ -9,6 +9,7 @@ Este flujo usa Google Apps Script para generar PDFs desde la web publicada y env
 - En cada pestaña solo propone horarios de ese nivel.
 - Para cada profesor muestra los PDFs previstos.
 - Permite generar y abrir el PDF para comprobarlo antes de enviar.
+- Permite personalizar el texto del correo antes de enviarlo.
 - Envía el PDF del profesor por Gmail.
 - Si el profesor es tutor, añade también el PDF del grupo, tanto de Primaria como de ESO/Bachillerato.
 
@@ -77,10 +78,11 @@ Si no pones `PDF_FOLDER_ID`, el script crea o usa una carpeta llamada `Horarios 
 
 1. Abre la URL de la aplicación web.
 2. Pulsa `Cargar lista`.
-3. Pulsa `Generar/ver PDF` en un profesor.
-4. Revisa el PDF que abre desde Drive.
-5. Si está correcto, pulsa `Enviar`.
-6. Para enviar varios, selecciónalos y pulsa `Enviar seleccionados`.
+3. Revisa o edita el campo `Texto del correo`.
+4. Pulsa `Generar/ver PDF` en un profesor.
+5. Revisa el PDF que abre desde Drive.
+6. Si está correcto, pulsa `Enviar`.
+7. Para enviar varios, selecciónalos y pulsa `Enviar seleccionados`.
 
 ## Seguridad
 
