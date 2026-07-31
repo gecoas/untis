@@ -348,15 +348,7 @@ table[border="3"][rules="all"] tr:nth-child(even) td:first-child {
     background: var(--blue-100) !important;
 }
 
-table[border="3"][rules="all"] tr:hover td {
-    background: #eef8fb !important;
-}
-
-table[border="3"][rules="all"] tr:hover td:first-child {
-    background: #dff0f7 !important;
-}
-
-/* Mantener los colores de leccion por encima de las filas alternas y hover. */
+/* Mantener los colores de leccion por encima de las filas alternas. */
 table[border="3"][rules="all"] tr td.lesson-color-1 { background: #fde2e4 !important; }
 table[border="3"][rules="all"] tr td.lesson-color-2 { background: #fad2e1 !important; }
 table[border="3"][rules="all"] tr td.lesson-color-3 { background: #e2ece9 !important; }
