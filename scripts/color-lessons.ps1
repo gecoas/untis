@@ -43,7 +43,11 @@ function Get-LessonKey([string]$Body, [bool]$IsProfessorPage) {
     $rows = [regex]::Matches($rest, '<TR><TD[^>]*>([\s\S]*?)</TD>\s*</TR>', [Text.RegularExpressions.RegexOptions]::IgnoreCase) |
         ForEach-Object { Strip-Tags ($_.Groups[1].Value) } |
         Where-Object { $_ -and $_ -notlike '*Untis*' }
-    return (($subject, $rows[0]) | Where-Object { $_ }) -join '|'
+    $group = ''
+    if ($null -ne $rows -and $rows.Count -gt 0) {
+        $group = $rows[0]
+    }
+    return (($subject, $group) | Where-Object { $_ }) -join '|'
 }
 
 function Add-LessonClass([string]$Attrs, [string]$ColorClass) {
