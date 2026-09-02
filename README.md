@@ -22,9 +22,13 @@ Colocar estos archivos junto a las carpetas de horarios:
 ```text
 untis.css
 upload-horarios.bat
+upload-horarios.command
+scripts/
 ```
 
 ## Subir a GitHub
+
+### Windows
 
 Ejecutar:
 
@@ -40,5 +44,25 @@ Requisitos:
 
 - Git for Windows instalado.
 - Git autenticado contra GitHub.
+
+### macOS
+
+Ejecutar desde Terminal una primera vez para dar permisos:
+
+```bash
+chmod +x upload-horarios.command scripts/*.py
+```
+
+Después puedes abrir `upload-horarios.command` con doble clic o desde Terminal:
+
+```bash
+./upload-horarios.command
+```
+
+Requisitos:
+
+- Git de macOS instalado.
+- `python3` instalado.
+- Clave SSH configurada en GitHub, comprobable con `ssh -T git@github.com`.
 
 Si `clases-eso/Clases.htm` muestra un aviso, significa que todavía no se ha subido la exportación real de clases de ESO.
