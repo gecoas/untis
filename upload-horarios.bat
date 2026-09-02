@@ -5,7 +5,7 @@ rem Ejecutar desde la carpeta que contiene:
 rem clases-pri, prof-pri, clases-eso y prof-eso.
 rem Requiere Git instalado y autenticado en GitHub.
 
-set "REPO_URL=https://github.com/gecoas/untis.git"
+set "REPO_URL=git@github.com:gecoas/untis.git"
 set "ROOT=%~dp0"
 set "WORK_DIR=%TEMP%\untis-upload-repo"
 set "COMMIT_MSG=Subir horarios Untis"
@@ -46,6 +46,11 @@ echo Coloreando lecciones... >> "%LOG%"
 powershell -NoProfile -ExecutionPolicy Bypass -File "%WORK_DIR%\scripts\color-lessons.ps1" -Root "%WORK_DIR%" >> "%LOG%" 2>&1
 if errorlevel 1 goto error_colores
 
+echo Validando copia antes del commit...
+echo Validando copia antes del commit... >> "%LOG%"
+powershell -NoProfile -ExecutionPolicy Bypass -File "%WORK_DIR%\scripts\validate-upload.ps1" -Root "%WORK_DIR%" >> "%LOG%" 2>&1
+if errorlevel 1 goto error_validacion
+
 cd /d "%WORK_DIR%"
 if errorlevel 1 goto error
 
@@ -54,6 +59,9 @@ if errorlevel 1 goto error
 
 git diff --cached --quiet
 if not errorlevel 1 goto sin_cambios
+
+git diff --cached --name-status -- clases-pri prof-pri clases-eso prof-eso | findstr /b "D" >> "%LOG%" 2>&1
+if not errorlevel 1 goto error_borrados
 
 echo Creando commit...
 echo Creando commit... >> "%LOG%"
@@ -91,7 +99,7 @@ echo Copiando %~1... >> "%LOG%"
 if exist "%WORK_DIR%\%~1\" rmdir /s /q "%WORK_DIR%\%~1" >> "%LOG%" 2>&1
 mkdir "%WORK_DIR%\%~1" >> "%LOG%" 2>&1
 if errorlevel 1 exit /b 1
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; Copy-Item -LiteralPath '%ROOT%%~1\*' -Destination '%WORK_DIR%\%~1' -Recurse -Force -Exclude 'Thumbs.db','Desktop.ini'" >> "%LOG%" 2>&1
+powershell -NoProfile -ExecutionPolicy Bypass -File "%WORK_DIR%\scripts\copy-folder.ps1" -Source "%ROOT%%~1" -Destination "%WORK_DIR%\%~1" >> "%LOG%" 2>&1
 if errorlevel 1 (
     echo ERROR: Fallo al copiar %~1.
     echo ERROR: Fallo al copiar %~1. >> "%LOG%"
@@ -129,6 +137,16 @@ goto mostrar_log
 
 :error_colores
 echo ERROR: No se pudieron colorear las lecciones.
+goto mostrar_log
+
+:error_validacion
+echo ERROR: La copia temporal no contiene todos los horarios esperados.
+echo No se ha creado commit para evitar borrar horarios en GitHub.
+goto mostrar_log
+
+:error_borrados
+echo ERROR: Git detecta borrados de horarios.
+echo No se ha creado commit para evitar borrar horarios en GitHub.
 goto mostrar_log
 
 :error_commit
