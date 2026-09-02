@@ -42,7 +42,7 @@ center {
     display: block;
     max-width: 1280px;
     margin: 0 auto;
-    padding: 24px 18px 40px;
+    padding: 14px 18px 32px;
 }
 
 font,
@@ -68,7 +68,7 @@ a:hover {
 body > center > font:first-child {
     display: block;
     overflow: hidden;
-    margin-bottom: 26px;
+    margin-bottom: 18px;
     padding: 0;
     color: white !important;
     background: linear-gradient(135deg, var(--blue-900), var(--blue-800)) !important;
@@ -79,7 +79,7 @@ body > center > font:first-child {
 body > center > .home-link-wrap + font[size="3"] > table:first-child,
 body > center > font[size="3"] > table:first-child {
     width: 100%;
-    margin: 0 0 24px !important;
+    margin: 0 0 18px !important;
     overflow: hidden;
     color: #ffffff !important;
     background: linear-gradient(135deg, var(--blue-900), var(--blue-800)) !important;
@@ -92,7 +92,7 @@ body > center > font[size="3"] > table:first-child {
 
 body > center > .home-link-wrap + font[size="3"] > table:first-child td,
 body > center > font[size="3"] > table:first-child td {
-    padding: 14px 18px !important;
+    padding: 8px 18px !important;
     color: #ffffff !important;
     background: transparent !important;
     border: 0 !important;
@@ -114,7 +114,7 @@ body > center > font[size="3"] > table:first-child b {
 
 body > center > font:first-child table {
     width: 100%;
-    min-height: 108px;
+    min-height: 62px;
     background: transparent !important;
     border: 0 !important;
 }
@@ -128,7 +128,7 @@ body > center > font:first-child font {
 }
 
 body > center > font:first-child td {
-    padding: 6px 10px !important;
+    padding: 3px 10px !important;
     font-size: 14px !important;
 }
 
@@ -141,8 +141,8 @@ body > center > font:first-child b {
 body > center > font[size="5"],
 body > center > font[size="4"] {
     display: block;
-    margin: 10px 0 18px;
-    padding-bottom: 14px;
+    margin: 4px 0 14px;
+    padding-bottom: 10px;
     color: var(--blue-900) !important;
     border-bottom: 3px solid #1da6d8;
     font-size: 24px !important;
@@ -431,8 +431,8 @@ table[cellspacing="1"][cellpadding="1"]:not([border="3"]) img[src*="Gp"] {
     justify-content: center;
     align-items: center;
     gap: 12px;
-    margin: 4px 0 18px;
-    padding: 12px 16px;
+    margin: 2px 0 10px;
+    padding: 7px 12px;
     background: #ffffff;
     border: 1px solid var(--line);
     border-radius: 999px;
@@ -444,24 +444,24 @@ table[cellspacing="1"][cellpadding="1"]:not([border="3"]) img[src*="Gp"] {
 }
 
 .top-nav .nav-icon {
-    width: 44px;
-    height: 44px;
+    width: 36px;
+    height: 36px;
 }
 
 .top-nav .nav-prev,
 .top-nav .nav-next {
-    font-size: 25px;
+    font-size: 22px;
 }
 
 .top-nav .nav-home {
-    font-size: 20px;
+    font-size: 17px;
 }
 
 .print-actions {
     display: flex;
     justify-content: center;
     gap: 12px;
-    margin: 0 0 18px;
+    margin: 0 0 12px;
     flex-wrap: wrap;
 }
 
@@ -469,8 +469,8 @@ table[cellspacing="1"][cellpadding="1"]:not([border="3"]) img[src*="Gp"] {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 150px;
-    padding: 11px 18px;
+    min-width: 135px;
+    padding: 9px 16px;
     color: #ffffff;
     background: var(--blue-800);
     border: 0;
