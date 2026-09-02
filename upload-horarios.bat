@@ -91,8 +91,12 @@ echo Copiando %~1... >> "%LOG%"
 if exist "%WORK_DIR%\%~1\" rmdir /s /q "%WORK_DIR%\%~1" >> "%LOG%" 2>&1
 mkdir "%WORK_DIR%\%~1" >> "%LOG%" 2>&1
 if errorlevel 1 exit /b 1
-robocopy "%ROOT%%~1" "%WORK_DIR%\%~1" /E /XD .git /XF Thumbs.db Desktop.ini >> "%LOG%" 2>&1
-if errorlevel 8 exit /b 1
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; Copy-Item -LiteralPath '%ROOT%%~1\*' -Destination '%WORK_DIR%\%~1' -Recurse -Force -Exclude 'Thumbs.db','Desktop.ini'" >> "%LOG%" 2>&1
+if errorlevel 1 (
+    echo ERROR: Fallo al copiar %~1.
+    echo ERROR: Fallo al copiar %~1. >> "%LOG%"
+    exit /b 1
+)
 copy /y "%WORK_DIR%\untis.css" "%WORK_DIR%\%~1\untis.css" >> "%LOG%" 2>&1
 if errorlevel 1 exit /b 1
 echo Preparando %~1...
