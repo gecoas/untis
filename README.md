@@ -59,7 +59,7 @@ Después puedes abrir `upload-horarios.command` con doble clic o desde Terminal:
 ./upload-horarios.command
 ```
 
-En todos los casos se suben los HTML de grupos y profesores de Primaria/ESO desde las carpetas locales habituales. Puedes indicar opcionalmente la ruta de un PDF con el listado: se subirá como `docs/horarios-listado.pdf` y GitHub Actions regenerará los cuadros de profesores ESO/Bach a partir de sus columnas.
+En todos los casos se suben los HTML de grupos y profesores de Primaria/ESO desde las carpetas locales habituales. Cuando se indica un PDF, los HTML locales de profesores ESO se omiten y GitHub Actions los regenera desde el PDF.
 
 También puedes indicarlo directamente:
 

@@ -83,6 +83,10 @@ git clone "$REPO_URL" "$WORK_DIR" >> "$LOG" 2>&1 || fail "No se pudo clonar el r
 log "Repositorio clonado."
 
 for folder in "${FOLDERS[@]}"; do
+  if [[ "$folder" == "prof-eso" && "$UPLOAD_PDF" == "1" ]]; then
+    log "Conservando prof-eso del repositorio; GitHub Actions lo regenerara desde el PDF."
+    continue
+  fi
   log "Copiando $folder..."
   index_file="$(expected_index "$folder")"
   log_file_info "Indice origen $folder" "$ROOT/$folder/$index_file"
