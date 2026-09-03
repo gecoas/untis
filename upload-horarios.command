@@ -94,6 +94,10 @@ for folder in "${FOLDERS[@]}"; do
   mkdir -p "$WORK_DIR/$folder" || fail "No se pudo crear $folder en la copia temporal."
   rsync -a --exclude '.git' --exclude 'Thumbs.db' --exclude 'Desktop.ini' "$ROOT/$folder/" "$WORK_DIR/$folder/" >> "$LOG" 2>&1 || fail "Fallo al copiar $folder."
   [[ -f "$WORK_DIR/$folder/$index_file" ]] || fail "No se copio $index_file en $folder."
+  if [[ "$folder" == "clases-eso" ]]; then
+    log "Eliminando franjas 15:05 y 16:05 de ESO 3, ESO 4 y Bachillerato..."
+    python3 "$WORK_DIR/scripts/remove-late-eso-slots.py" --folder "$WORK_DIR/$folder" >> "$LOG" 2>&1 || fail "No se pudieron eliminar las franjas finales de clases-eso."
+  fi
   log_file_info "Indice copiado $folder" "$WORK_DIR/$folder/$index_file"
   cp "$WORK_DIR/untis.css" "$WORK_DIR/$folder/untis.css" || fail "No se pudo copiar untis.css en $folder."
   log "Preparando $folder..."
