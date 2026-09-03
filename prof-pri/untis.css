@@ -503,6 +503,32 @@ table[cellspacing="1"][cellpadding="1"]:not([border="3"]) img[src*="Gp"] {
     outline: none;
 }
 
+table.generated-timetable {
+    width: 100%;
+    table-layout: fixed;
+}
+
+table.generated-timetable col.time-column {
+    width: 9%;
+}
+
+table.generated-timetable col.day-column {
+    width: 18.2%;
+}
+
+body > center > table[border="3"][rules="all"] {
+    width: 100%;
+    table-layout: fixed;
+}
+
+body > center > table[border="3"][rules="all"] > tbody > tr > td:first-child {
+    width: 9% !important;
+}
+
+body > center > table[border="3"][rules="all"] > tbody > tr > td:not(:first-child) {
+    width: 18.2% !important;
+}
+
 .nav-prev,
 .nav-next {
     font-size: 22px;
