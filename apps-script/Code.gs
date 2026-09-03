@@ -1,6 +1,6 @@
 const DEFAULT_SITE_BASE_URL = 'https://gecoas.github.io/untis';
 const DEFAULT_SHEET_NAMES = ['Primaria', 'ESO/Bach'];
-const DEFAULT_EMAIL_BODY = 'Adjunto se envían los horarios correspondientes al curso 2026-2027.\n\nUn saludo.';
+const DEFAULT_EMAIL_BODY = 'Te adjunto tu/s horario/s correspondientes al curso 2026-2027. Faltan por añadir los encargos, tutorías aula de convivencia, etc. Lo añadiré cuando tengamos cerrada la versión definitiva. Un saludo.';
 
 const PROFESSOR_TIMETABLES = [
   ['González Alonso Adrián', 'prof-pri/Profesores_Adri.htm'],
