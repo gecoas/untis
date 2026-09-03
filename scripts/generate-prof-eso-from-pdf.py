@@ -122,7 +122,7 @@ def parse_pdf(pdf_path, pdftotext_bin):
             groups = group_match.group(0).strip()
             room = rest[group_match.end():].strip()
         else:
-            room_match = re.search(r'\s{2,}([A-Z][A-Z0-9]+)$', rest)
+            room_match = re.search(r'\s{2,}([A-Z][A-Z0-9.]+)$', rest)
             room = room_match.group(1) if room_match else ''
             subject = rest[:room_match.start()].strip() if room_match else rest
             groups = ''
