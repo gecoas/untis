@@ -1,6 +1,7 @@
 name: Generar horarios ESO desde PDF
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - 'docs/horarios-listado.pdf'
