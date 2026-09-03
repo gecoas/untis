@@ -39,6 +39,7 @@ const PROFESSOR_TIMETABLES = [
   ['Ávila Pérez Ion', 'prof-eso/Profesores_Ion.htm'],
   ['Caballero Dávila Jes', 'prof-eso/Profesores_Jesfa.htm'],
   ['Martínez González Ju', 'prof-eso/Profesores_Jua3.htm'],
+  ['Novoa Somalo', 'prof-eso/Profesores_Jul3.htm'],
   ['De Pablos Alvarez La', 'prof-eso/Profesores_Lau2.htm'],
   ['Espiño Perez Lorena', 'prof-eso/Profesores_Lore.htm'],
   ['Fernández Artazcoz M', 'prof-eso/Profesores_Maa_J.htm'],
@@ -46,7 +47,6 @@ const PROFESSOR_TIMETABLES = [
   ['Irigaray Murillo Mar', 'prof-eso/Profesores_Mar11.htm'],
   ['Ruiz Neira Marcos', 'prof-eso/Profesores_Marc.htm'],
   ['Bibián Lamarca Miche', 'prof-eso/Profesores_Mich.htm'],
-  ['García Suarez Pablo', 'prof-eso/Profesores_Pab2.htm'],
   ['Ortiz Martínez Patri', 'prof-eso/Profesores_Pat2.htm'],
   ['Ruiz Lucendo Ramón', 'prof-eso/Profesores_Ramf3.htm'],
   ['Fernández Martínez S', 'prof-eso/Profesores_Susa.htm']

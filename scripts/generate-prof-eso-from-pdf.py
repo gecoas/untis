@@ -23,7 +23,7 @@ TEACHERS = {
     'Inma': ('Borraz Viver Inmacul', 'Profesores_Inma.htm'),
     'Ion': ('Ávila Pérez Ion', 'Profesores_Ion.htm'),
     'Jesús': ('Caballero Dávila Jes', 'Profesores_Jesfa.htm'),
-    'Julio': ('Martínez González Ju', 'Profesores_Jul3.htm'),
+    'Julio': ('Novoa Somalo', 'Profesores_Jul3.htm'),
     'Laura': ('De Pablos Alvarez La', 'Profesores_Lau2.htm'),
     'Lorena': ('Espiño Perez Lorena', 'Profesores_Lore.htm'),
     'Mª Jesús': ('Irigaray Murillo Mar', 'Profesores_Mar11.htm'),
