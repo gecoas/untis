@@ -97,14 +97,18 @@ for folder in "${FOLDERS[@]}"; do
   log_file_info "Indice preparado $folder" "$WORK_DIR/$folder/$index_file"
 done
 
-log "Coloreando lecciones..."
-python3 "$WORK_DIR/scripts/color-lessons.py" --root "$WORK_DIR" >> "$LOG" 2>&1 || fail "No se pudieron colorear las lecciones."
-
 if [[ "$UPLOAD_PDF" == "1" ]]; then
   log "Copiando PDF de horarios..."
   mkdir -p "$WORK_DIR/docs" || fail "No se pudo crear docs en la copia temporal."
   cp "$PDF_SOURCE" "$WORK_DIR/docs/horarios-listado.pdf" || fail "No se pudo copiar el PDF."
+  log "Generando horarios de profesores ESO/Bach desde el PDF..."
+  python3 "$WORK_DIR/scripts/generate-prof-eso-from-pdf.py" --pdf "$WORK_DIR/docs/horarios-listado.pdf" --output "$WORK_DIR/prof-eso" >> "$LOG" 2>&1 || fail "No se pudieron generar los horarios de profesores desde el PDF."
+  cp "$WORK_DIR/untis.css" "$WORK_DIR/prof-eso/untis.css" || fail "No se pudo copiar untis.css en prof-eso tras generar los horarios."
+  python3 "$WORK_DIR/scripts/prepare-horarios.py" --folder "$WORK_DIR/prof-eso" >> "$LOG" 2>&1 || fail "No se pudo preparar prof-eso generado desde el PDF."
 fi
+
+log "Coloreando lecciones..."
+python3 "$WORK_DIR/scripts/color-lessons.py" --root "$WORK_DIR" >> "$LOG" 2>&1 || fail "No se pudieron colorear las lecciones."
 
 log "Validando copia antes del commit..."
 for folder in "${FOLDERS[@]}"; do
@@ -112,6 +116,9 @@ for folder in "${FOLDERS[@]}"; do
   index_file="$(expected_index "$folder")"
   [[ -f "$WORK_DIR/$folder/$index_file" ]] || fail "$folder no contiene $index_file en la copia temporal."
 done
+if [[ "$UPLOAD_PDF" == "1" ]]; then
+  [[ -f "$WORK_DIR/docs/horarios-listado.pdf" ]] || fail "No se copio el PDF en la copia temporal."
+fi
 
 cd "$WORK_DIR" || fail "No se pudo entrar en la carpeta temporal."
 git add -A >> "$LOG" 2>&1 || fail "No se pudo preparar el commit."

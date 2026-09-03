@@ -59,7 +59,7 @@ Después puedes abrir `upload-horarios.command` con doble clic o desde Terminal:
 ./upload-horarios.command
 ```
 
-Al iniciarlo, puedes indicar opcionalmente la ruta de un PDF con el listado de horarios. Se subirá como `docs/horarios-listado.pdf`.
+En todos los casos se suben los HTML de grupos y profesores de Primaria/ESO desde las carpetas locales habituales. Puedes indicar opcionalmente la ruta de un PDF con el listado: se subirá como `docs/horarios-listado.pdf` y, además, se regenerarán los cuadros de profesores ESO/Bach a partir de sus columnas.
 
 También puedes indicarlo directamente:
 
