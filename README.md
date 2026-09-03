@@ -77,6 +77,7 @@ Requisitos:
 
 - Git de macOS instalado.
 - `python3` instalado.
+- `pdftotext` instalado para regenerar ESO desde el PDF (`brew install poppler`).
 - Clave SSH configurada en GitHub, comprobable con `ssh -T git@github.com`.
 
 Si `clases-eso/Clases.htm` muestra un aviso, significa que todavía no se ha subido la exportación real de clases de ESO.

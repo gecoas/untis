@@ -63,6 +63,7 @@ command -v python3 >> "$LOG" 2>&1 || fail "python3 no esta instalado. Instala Xc
 if [[ "$UPLOAD_PDF" == "1" ]]; then
   [[ -f "$PDF_SOURCE" ]] || fail "No existe el PDF indicado: $PDF_SOURCE"
   [[ "${PDF_SOURCE##*.}" == "pdf" || "${PDF_SOURCE##*.}" == "PDF" ]] || fail "El archivo indicado no parece un PDF."
+  command -v pdftotext >> "$LOG" 2>&1 || fail "No se encuentra pdftotext. Instala Poppler con: brew install poppler"
   log "PDF seleccionado: $PDF_SOURCE"
 fi
 

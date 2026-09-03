@@ -57,7 +57,10 @@ def js_hash(value):
 
 def parse_pdf(pdf_path):
     with tempfile.NamedTemporaryFile(suffix='.txt') as text_file:
-        subprocess.run(['pdftotext', '-layout', str(pdf_path), text_file.name], check=True)
+        try:
+            subprocess.run(['pdftotext', '-layout', str(pdf_path), text_file.name], check=True)
+        except FileNotFoundError:
+            raise SystemExit('No se encuentra pdftotext. Instala Poppler con: brew install poppler')
         lines = Path(text_file.name).read_text(encoding='utf-8', errors='replace').splitlines()
 
     teachers = sorted(TEACHERS, key=len, reverse=True)
