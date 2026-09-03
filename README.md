@@ -60,6 +60,7 @@ Después puedes abrir `upload-horarios.command` con doble clic o desde Terminal:
 ```
 
 En todos los casos se suben los HTML de grupos y profesores de Primaria/ESO desde las carpetas locales habituales. Cuando se indica un PDF, los HTML locales de profesores ESO se omiten y GitHub Actions los regenera desde el PDF.
+Las franjas de los profesores ESO se toman de `clases-eso`: 1º/2º ESO usa su horario específico y 3º/4º ESO y Bachillerato usan el otro.
 
 También puedes indicarlo directamente:
 
