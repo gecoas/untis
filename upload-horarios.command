@@ -7,6 +7,22 @@ WORK_DIR="${TMPDIR:-/tmp}/untis-upload-repo"
 LOG="$ROOT/upload-horarios.log"
 COMMIT_MSG="Subir horarios Untis"
 FOLDERS=(clases-pri prof-pri clases-eso prof-eso)
+PDF_SOURCE=""
+UPLOAD_PDF=0
+
+if [[ "${1:-}" == "--pdf" ]]; then
+  [[ -n "${2:-}" ]] || { printf '%s\n' "Uso: $0 --pdf /ruta/al/archivo.pdf"; exit 1; }
+  PDF_SOURCE="$2"
+  UPLOAD_PDF=1
+elif [[ "${1:-}" == "--no-pdf" ]]; then
+  UPLOAD_PDF=0
+elif [[ -n "${1:-}" ]]; then
+  printf '%s\n' "Uso: $0 [--pdf /ruta/al/archivo.pdf|--no-pdf]"
+  exit 1
+else
+  read -r -p "Ruta del PDF de horarios (Enter para no subirlo): " PDF_SOURCE
+  [[ -z "$PDF_SOURCE" ]] || UPLOAD_PDF=1
+fi
 
 log() {
   printf '%s\n' "$*" | tee -a "$LOG"
@@ -44,6 +60,12 @@ echo "Inicio $(date '+%d/%m/%Y %H:%M:%S')" > "$LOG"
 command -v git >> "$LOG" 2>&1 || fail "Git no esta instalado. Instala Git o Xcode Command Line Tools."
 command -v python3 >> "$LOG" 2>&1 || fail "python3 no esta instalado. Instala Xcode Command Line Tools."
 
+if [[ "$UPLOAD_PDF" == "1" ]]; then
+  [[ -f "$PDF_SOURCE" ]] || fail "No existe el PDF indicado: $PDF_SOURCE"
+  [[ "${PDF_SOURCE##*.}" == "pdf" || "${PDF_SOURCE##*.}" == "PDF" ]] || fail "El archivo indicado no parece un PDF."
+  log "PDF seleccionado: $PDF_SOURCE"
+fi
+
 for folder in "${FOLDERS[@]}"; do
   [[ -d "$ROOT/$folder" ]] || fail "No existe la carpeta $folder junto a este script."
   compgen -G "$ROOT/$folder/*.htm" > /dev/null || fail "La carpeta $folder no contiene archivos .htm."
@@ -77,6 +99,12 @@ done
 
 log "Coloreando lecciones..."
 python3 "$WORK_DIR/scripts/color-lessons.py" --root "$WORK_DIR" >> "$LOG" 2>&1 || fail "No se pudieron colorear las lecciones."
+
+if [[ "$UPLOAD_PDF" == "1" ]]; then
+  log "Copiando PDF de horarios..."
+  mkdir -p "$WORK_DIR/docs" || fail "No se pudo crear docs en la copia temporal."
+  cp "$PDF_SOURCE" "$WORK_DIR/docs/horarios-listado.pdf" || fail "No se pudo copiar el PDF."
+fi
 
 log "Validando copia antes del commit..."
 for folder in "${FOLDERS[@]}"; do

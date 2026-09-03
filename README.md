@@ -59,6 +59,20 @@ Después puedes abrir `upload-horarios.command` con doble clic o desde Terminal:
 ./upload-horarios.command
 ```
 
+Al iniciarlo, puedes indicar opcionalmente la ruta de un PDF con el listado de horarios. Se subirá como `docs/horarios-listado.pdf`.
+
+También puedes indicarlo directamente:
+
+```bash
+./upload-horarios.command --pdf "/ruta/al/listado-horarios.pdf"
+```
+
+Para no subir ningún PDF y evitar la pregunta:
+
+```bash
+./upload-horarios.command --no-pdf
+```
+
 Requisitos:
 
 - Git de macOS instalado.
