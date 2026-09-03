@@ -105,6 +105,7 @@ if [[ "$UPLOAD_PDF" == "1" ]]; then
   log "Copiando PDF de horarios..."
   mkdir -p "$WORK_DIR/docs" || fail "No se pudo crear docs en la copia temporal."
   cp "$PDF_SOURCE" "$WORK_DIR/docs/horarios-listado.pdf" || fail "No se pudo copiar el PDF."
+  date '+%Y-%m-%dT%H:%M:%S%z' > "$WORK_DIR/docs/horarios-listado.trigger" || fail "No se pudo registrar el disparador del PDF."
   log "El PDF se procesara en GitHub Actions para actualizar prof-eso."
 fi
 

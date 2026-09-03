@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - 'docs/horarios-listado.pdf'
+      - 'docs/horarios-listado.trigger'
       - 'scripts/generate-prof-eso-from-pdf.py'
       - '.github/workflows/generate-prof-eso.yml'
 
