@@ -38,6 +38,11 @@ TEACHERS = {
 }
 DAY_NAMES = {'Lu': 'Lunes', 'Ma': 'Martes', 'Mi': 'Miércoles', 'Ju': 'Jueves', 'Vi': 'Viernes'}
 DAY_ORDER = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi']
+DAY_SLOTS = [
+    ('08:15', '09:15'), ('09:15', '10:05'), ('10:05', '10:55'),
+    ('10:55', '11:25'), ('11:50', '12:40'), ('12:40', '13:30'),
+    ('13:30', '14:25'), ('14:15', '15:05'), ('15:05', '16:00'),
+]
 COLOR_COUNT = 20
 
 
@@ -115,8 +120,8 @@ def lesson_cell(lesson):
     return f'<td class="lesson-color-{color}"><div class="lesson">{"<br>".join(details)}</div></td>'
 
 
-def build_html(display_name, lessons):
-    slots = sorted({(lesson['start'], lesson['end']) for lesson in lessons})
+def build_html(display_name, lessons, previous_file, next_file):
+    slots = sorted(set(DAY_SLOTS) | {(lesson['start'], lesson['end']) for lesson in lessons})
     by_slot = defaultdict(list)
     for lesson in lessons:
         by_slot[(lesson['day'], lesson['start'], lesson['end'])].append(lesson)
@@ -137,23 +142,24 @@ def build_html(display_name, lessons):
                 cells.append('<td></td>')
         body.append('<tr>' + ''.join(cells) + '</tr>')
 
-    return f'''<!doctype html>
-<html lang="es">
+    previous_link = f'<A HREF="{previous_file}"><span class="nav-icon nav-prev">&#8592;</span></A>' if previous_file else ''
+    next_link = f'<A HREF="{next_file}"><span class="nav-icon nav-next">&#8594;</span></A>' if next_file else ''
+    return f'''<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
 <head>
-<meta charset="utf-8">
-<title>Horario de {html.escape(display_name)}</title>
-<link rel="stylesheet" href="untis.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="GENERATOR" content="Untis 2027">
+<title>Untis 2027  Curso 2026-2027  COAS</title>
+<link rel="stylesheet" type="text/css" href="untis.css">
 </head>
-<body class="teacher-timetable">
-<main>
-<div class="home-link-wrap"><a class="home-link" href="../index.html">&#8592; Volver al inicio</a></div>
-<header class="schedule-header"><strong>COAS</strong><span>Curso 2026-2027</span><strong>Untis 2027</strong></header>
-<h1>{html.escape(display_name)}</h1>
-<div class="top-nav"><a href="Profesores.htm"><span class="nav-icon nav-home">&#127968;</span></a></div>
-<div class="print-actions"><button type="button" class="print-action" onclick="window.print()">Descargar PDF</button><button type="button" class="print-action" onclick="window.print()">Imprimir</button></div>
-<table border="3" rules="all" class="generated-timetable"><thead><tr>{header}</tr></thead><tbody>{''.join(body)}</tbody></table>
-<footer>alcaste-lasfuentes.com</footer>
-</main>
+<body class=tt>
+<CENTER><div class="home-link-wrap"><a class="home-link" href="../index.html">&#8592; Volver al inicio</a></div><font size="3" face="Arial" color="#000000">
+<TABLE border="0" cellpadding="1"><TR><TD rowspan="2" width="5"></TD><TD><b>COAS</b></TD><TD rowspan="2" width="5"></TD><TD>Curso 2026-2027</TD><TD rowspan="2" width="5"></TD><TD align="right"><b>Untis 2027</b></TD><TD rowspan="2" width="5"></TD></TR><TR><TD>ES-Leioa</TD><TD>Alcaste - Las Fuentes</TD><TD align="right">3/9/2026 19:00</TD></TR></TABLE><BR></font>
+<font size="4" face="Arial"><B>{html.escape(display_name)}</B></font>
+<div class="top-nav">{previous_link}<A HREF="Profesores.htm"><span class="nav-icon nav-home">&#127968;</span></A>{next_link}</div><div class="print-actions"><button type="button" class="print-action" onclick="window.print()">Descargar PDF</button><button type="button" class="print-action" onclick="window.print()">Imprimir</button></div><BR>
+<TABLE border="3" rules="all" cellpadding="1" cellspacing="1"><TR><TD align="center">Hora</TD>{''.join(f'<TD colspan="1" align="center"><B>{name}</B></TD>' for name in [DAY_NAMES[day] for day in DAY_ORDER])}</TR>{''.join(body)}</TABLE>
+<font size="3" face="Arial">alcaste-lasfuentes.com</font>
+</CENTER>
 </body>
 </html>'''
 
@@ -167,12 +173,15 @@ def main():
     output = Path(args.output)
     output.mkdir(parents=True, exist_ok=True)
     rows = parse_pdf(Path(args.pdf), args.pdftotext)
-    for teacher, (display_name, filename) in TEACHERS.items():
+    teacher_items = list(TEACHERS.items())
+    for index, (teacher, (display_name, filename)) in enumerate(teacher_items):
         lessons = rows.get(teacher, [])
         if not lessons:
             print(f'Aviso: no hay registros para {teacher}')
             continue
-        (output / filename).write_text(build_html(display_name, lessons), encoding='utf-8')
+        previous_file = teacher_items[index - 1][1][1] if index else None
+        next_file = teacher_items[index + 1][1][1] if index + 1 < len(teacher_items) else None
+        (output / filename).write_text(build_html(display_name, lessons, previous_file, next_file), encoding='utf-8')
     print(f'Generados {sum(bool(rows.get(teacher)) for teacher in TEACHERS)} horarios de profesores en {output}')
 
 
