@@ -55,10 +55,10 @@ def js_hash(value):
     return abs(result)
 
 
-def parse_pdf(pdf_path):
+def parse_pdf(pdf_path, pdftotext_bin):
     with tempfile.NamedTemporaryFile(suffix='.txt') as text_file:
         try:
-            subprocess.run(['pdftotext', '-layout', str(pdf_path), text_file.name], check=True)
+            subprocess.run([pdftotext_bin, '-layout', str(pdf_path), text_file.name], check=True)
         except FileNotFoundError:
             raise SystemExit('No se encuentra pdftotext. Instala Poppler con: brew install poppler')
         lines = Path(text_file.name).read_text(encoding='utf-8', errors='replace').splitlines()
@@ -146,10 +146,11 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--pdf', required=True)
     parser.add_argument('--output', required=True)
+    parser.add_argument('--pdftotext', default='pdftotext')
     args = parser.parse_args()
     output = Path(args.output)
     output.mkdir(parents=True, exist_ok=True)
-    rows = parse_pdf(Path(args.pdf))
+    rows = parse_pdf(Path(args.pdf), args.pdftotext)
     for teacher, (display_name, filename) in TEACHERS.items():
         lessons = rows.get(teacher, [])
         if not lessons:

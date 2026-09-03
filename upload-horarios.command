@@ -63,7 +63,9 @@ command -v python3 >> "$LOG" 2>&1 || fail "python3 no esta instalado. Instala Xc
 if [[ "$UPLOAD_PDF" == "1" ]]; then
   [[ -f "$PDF_SOURCE" ]] || fail "No existe el PDF indicado: $PDF_SOURCE"
   [[ "${PDF_SOURCE##*.}" == "pdf" || "${PDF_SOURCE##*.}" == "PDF" ]] || fail "El archivo indicado no parece un PDF."
-  command -v pdftotext >> "$LOG" 2>&1 || fail "No se encuentra pdftotext. Instala Poppler con: brew install poppler"
+  PDFTOTEXT_BIN="$(type -P pdftotext || true)"
+  [[ -n "$PDFTOTEXT_BIN" && -x "$PDFTOTEXT_BIN" ]] || fail "No se encuentra el ejecutable pdftotext. Instala Poppler con: brew install poppler"
+  log "pdftotext: $PDFTOTEXT_BIN"
   log "PDF seleccionado: $PDF_SOURCE"
 fi
 
@@ -103,7 +105,7 @@ if [[ "$UPLOAD_PDF" == "1" ]]; then
   mkdir -p "$WORK_DIR/docs" || fail "No se pudo crear docs en la copia temporal."
   cp "$PDF_SOURCE" "$WORK_DIR/docs/horarios-listado.pdf" || fail "No se pudo copiar el PDF."
   log "Generando horarios de profesores ESO/Bach desde el PDF..."
-  python3 "$WORK_DIR/scripts/generate-prof-eso-from-pdf.py" --pdf "$WORK_DIR/docs/horarios-listado.pdf" --output "$WORK_DIR/prof-eso" >> "$LOG" 2>&1 || fail "No se pudieron generar los horarios de profesores desde el PDF."
+  python3 "$WORK_DIR/scripts/generate-prof-eso-from-pdf.py" --pdf "$WORK_DIR/docs/horarios-listado.pdf" --output "$WORK_DIR/prof-eso" --pdftotext "$PDFTOTEXT_BIN" >> "$LOG" 2>&1 || fail "No se pudieron generar los horarios de profesores desde el PDF."
   cp "$WORK_DIR/untis.css" "$WORK_DIR/prof-eso/untis.css" || fail "No se pudo copiar untis.css en prof-eso tras generar los horarios."
   python3 "$WORK_DIR/scripts/prepare-horarios.py" --folder "$WORK_DIR/prof-eso" >> "$LOG" 2>&1 || fail "No se pudo preparar prof-eso generado desde el PDF."
 fi
