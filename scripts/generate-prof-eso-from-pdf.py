@@ -55,13 +55,29 @@ def js_hash(value):
     return abs(result)
 
 
-def parse_pdf(pdf_path, pdftotext_bin):
-    with tempfile.NamedTemporaryFile(suffix='.txt') as text_file:
-        try:
+def extract_pdf_lines(pdf_path, pdftotext_bin):
+    if pdftotext_bin:
+        with tempfile.NamedTemporaryFile(suffix='.txt') as text_file:
             subprocess.run([pdftotext_bin, '-layout', str(pdf_path), text_file.name], check=True)
-        except FileNotFoundError:
-            raise SystemExit('No se encuentra pdftotext. Instala Poppler con: brew install poppler')
-        lines = Path(text_file.name).read_text(encoding='utf-8', errors='replace').splitlines()
+            return Path(text_file.name).read_text(encoding='utf-8', errors='replace').splitlines()
+
+    try:
+        from pypdf import PdfReader
+    except ImportError:
+        raise SystemExit('No hay pdftotext ni pypdf. Instala la alternativa Python con: python3 -m pip install --user pypdf')
+
+    lines = []
+    for page in PdfReader(str(pdf_path)).pages:
+        try:
+            text = page.extract_text(extraction_mode='layout')
+        except TypeError:
+            text = page.extract_text()
+        lines.extend((text or '').splitlines())
+    return lines
+
+
+def parse_pdf(pdf_path, pdftotext_bin):
+    lines = extract_pdf_lines(pdf_path, pdftotext_bin)
 
     teachers = sorted(TEACHERS, key=len, reverse=True)
     rows = defaultdict(list)

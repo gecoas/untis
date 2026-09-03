@@ -59,7 +59,7 @@ Después puedes abrir `upload-horarios.command` con doble clic o desde Terminal:
 ./upload-horarios.command
 ```
 
-En todos los casos se suben los HTML de grupos y profesores de Primaria/ESO desde las carpetas locales habituales. Puedes indicar opcionalmente la ruta de un PDF con el listado: se subirá como `docs/horarios-listado.pdf` y, además, se regenerarán los cuadros de profesores ESO/Bach a partir de sus columnas.
+En todos los casos se suben los HTML de grupos y profesores de Primaria/ESO desde las carpetas locales habituales. Puedes indicar opcionalmente la ruta de un PDF con el listado: se subirá como `docs/horarios-listado.pdf` y GitHub Actions regenerará los cuadros de profesores ESO/Bach a partir de sus columnas.
 
 También puedes indicarlo directamente:
 
@@ -77,7 +77,7 @@ Requisitos:
 
 - Git de macOS instalado.
 - `python3` instalado.
-- `pdftotext` instalado para regenerar ESO desde el PDF (`brew install poppler`).
+- No es necesario instalar herramientas PDF en el Mac: la extracción se realiza en GitHub Actions.
 - Clave SSH configurada en GitHub, comprobable con `ssh -T git@github.com`.
 
 Si `clases-eso/Clases.htm` muestra un aviso, significa que todavía no se ha subido la exportación real de clases de ESO.
