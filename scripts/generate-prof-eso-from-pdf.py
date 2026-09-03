@@ -43,7 +43,6 @@ DAY_SLOTS = [
     ('10:55', '11:25'), ('11:25', '11:50'), ('11:50', '12:40'),
     ('12:40', '13:30'), ('13:30', '13:55'), ('13:55', '14:15'),
     ('13:30', '14:25'), ('14:15', '15:05'), ('15:05', '16:00'),
-    ('16:05', '16:30'),
 ]
 COLOR_COUNT = 20
 
@@ -92,6 +91,8 @@ def load_stage_slots(class_folder):
         text = path.read_text(encoding='utf-8', errors='replace')
         times = time_pattern.findall(text)
         for start, end in zip(times[::2], times[1::2]):
+            if (start, end) == ('16:05', '16:30'):
+                continue
             stage_slots[stage].add((start.zfill(5), end.zfill(5)))
     if not stage_slots['lower'] or not stage_slots['upper']:
         return {'lower': set(DAY_SLOTS), 'upper': set(DAY_SLOTS)}
@@ -116,11 +117,16 @@ def parse_pdf(pdf_path, pdftotext_bin):
             continue
         rest = rest[len(teacher):].strip()
         group_match = group_pattern.search(rest)
-        if not group_match:
+        if group_match:
+            subject = rest[:group_match.start()].strip()
+            groups = group_match.group(0).strip()
+            room = rest[group_match.end():].strip()
+        else:
+            subject = rest
+            groups = ''
+            room = ''
+        if not subject:
             continue
-        subject = rest[:group_match.start()].strip()
-        groups = group_match.group(0).strip()
-        room = rest[group_match.end():].strip()
         rows[teacher].append({'day': day, 'start': start, 'end': end, 'subject': subject, 'groups': groups, 'room': room})
     for teacher in rows:
         unique = {(lesson['day'], lesson['start'], lesson['end'], lesson['subject'], lesson['groups'], lesson['room']): lesson for lesson in rows[teacher]}
@@ -131,7 +137,9 @@ def parse_pdf(pdf_path, pdftotext_bin):
 def lesson_cell(lesson):
     key = normalize(lesson['subject'] + '|' + lesson['groups'])
     color = (js_hash(key) % COLOR_COUNT) + 1
-    details = [f"<b>{html.escape(lesson['subject'])}</b>", f"<i>{html.escape(lesson['groups'])}</i>"]
+    details = [f"<b>{html.escape(lesson['subject'])}</b>"]
+    if lesson['groups']:
+        details.append(f"<i>{html.escape(lesson['groups'])}</i>")
     if lesson['room']:
         details.append(f"<small>{html.escape(lesson['room'])}</small>")
     return f'<td class="lesson-color-{color}"><div class="lesson">{"<br>".join(details)}</div></td>'
