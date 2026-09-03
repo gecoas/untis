@@ -21,6 +21,9 @@ def read_html(path: Path) -> str:
 
 def fix_mojibake(content: str) -> str:
     content = content.replace('Ã‚º', 'º').replace('Ã‚ª', 'ª').replace('Âº', 'º').replace('Âª', 'ª')
+    content = re.sub(r'([1-4])� ESO', r'\1º ESO', content)
+    content = re.sub(r'([12])� Bachillerato', r'\1º Bachillerato', content)
+    content = content.replace('Mi�rcoles', 'Miércoles')
     for code in CODES:
         good = chr(code)
         bad = good
