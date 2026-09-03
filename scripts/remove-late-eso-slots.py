@@ -12,7 +12,7 @@ def remove_slots(path: Path) -> bool:
     changed = False
     for start in LATE_STARTS:
         pattern = re.compile(
-            rf'<TR>\s*<TD rowspan=2[^>]*>.*?<font size="2" face="Arial">\s*{re.escape(start)}\s*</font>.*?</TD>.*?</TR>\s*<TR>\s*</TR>',
+            rf'<TR>\s*<TD rowspan=2[^>]*><TABLE><TR><TD[^>]*><font[^>]*size="2"[^>]*>\s*{re.escape(start)}\s*</font>.*?</TD></TR></TABLE></TD>.*?</TR>\s*<TR>\s*</TR>',
             re.IGNORECASE | re.DOTALL,
         )
         content, count = pattern.subn('', content, count=1)
