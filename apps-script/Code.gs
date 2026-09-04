@@ -365,6 +365,27 @@ function buildPrintableHtml_(path) {
   let html = UrlFetchApp.fetch(pageUrl).getContentText('UTF-8');
   const css = UrlFetchApp.fetch(cssUrl).getContentText('UTF-8');
   html = html.replace(/<link\s+rel="stylesheet"\s+type="text\/css"\s+href="untis\.css"\s*>/i, '<style>' + css + '</style>');
+  html = html.replace('</head>', `<style>
+@media print {
+  @page { size: landscape; margin: 2mm; }
+  body > center { width: 100% !important; max-width: none !important; }
+  body > center > table[border="3"][rules="all"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    table-layout: fixed !important;
+  }
+  body > center > table[border="3"][rules="all"] > tbody > tr > td:first-child,
+  body > center > table[border="3"][rules="all"] > tr > td:first-child {
+    width: 9% !important;
+    min-width: 0 !important;
+  }
+  body > center > table[border="3"][rules="all"] > tbody > tr > td:not(:first-child),
+  body > center > table[border="3"][rules="all"] > tr > td:not(:first-child) {
+    width: 18.2% !important;
+  }
+}
+</style></head>`);
   html = html.replace('</head>', '<base href="' + baseUrl + '/' + folderPath + '/"></head>');
   return html;
 }
