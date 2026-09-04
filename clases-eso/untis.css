@@ -664,7 +664,7 @@ body > center > font[size="3"]:last-of-type {
 
     center {
         max-width: none;
-        width: 293mm;
+        width: 100%;
         padding: 0;
     }
 
@@ -742,13 +742,15 @@ body > center > font[size="3"]:last-of-type {
     }
 
     table[border="3"][rules="all"] {
-        width: 293mm !important;
+        width: 100% !important;
+        max-width: 100% !important;
         height: auto !important;
         min-height: 0;
         margin: 0 auto !important;
         border: 1px solid #7796a8 !important;
         box-shadow: none !important;
         table-layout: fixed;
+        box-sizing: border-box;
         page-break-inside: avoid;
         transform: none;
     }
