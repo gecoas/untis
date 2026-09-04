@@ -24,6 +24,19 @@ def fix_mojibake(content: str) -> str:
     content = re.sub(r'([1-4])� ESO', r'\1º ESO', content)
     content = re.sub(r'([12])� Bachillerato', r'\1º Bachillerato', content)
     content = content.replace('Mi�rcoles', 'Miércoles')
+    replacements = {
+        'Franc�s': 'Francés', 'F�sica': 'Física', 'Qu�mica': 'Química',
+        'Matem�ticas': 'Matemáticas', 'Biolog�a': 'Biología', 'Ingl�s': 'Inglés',
+        'Religi�n': 'Religión', 'Ed. F�sica': 'Ed. Física', 'M�sica': 'Música',
+        'Pl�stica': 'Plástica', 'Geograf�a': 'Geografía', 'Orientaci�n': 'Orientación',
+        'Dibujo T�cnico': 'Dibujo Técnico', 'H� Filosof�a': 'Hª Filosofía', 'H� Mundo': 'Hª Mundo', 'Filosof�a': 'Filosofía',
+        'Econom�a': 'Economía', 'Programaci�n': 'Programación', 'Mar�a': 'María',
+        'M� Jesús': 'Mª Jesús', 'Jes�s': 'Jesús', 'Geolog�a': 'Geología',
+        'Tutor�a': 'Tutoría', 'Lat�n': 'Latín', 'Ram�n': 'Ramón', 'Historia Espa�a': 'Historia España',
+        'Gesti�n': 'Gestión',
+    }
+    for bad, good in replacements.items():
+        content = content.replace(bad, good)
     for code in CODES:
         good = chr(code)
         bad = good
