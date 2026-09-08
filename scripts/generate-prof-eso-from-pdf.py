@@ -111,10 +111,18 @@ def parse_pdf(pdf_path, pdftotext_bin):
 
     teachers = sorted(TEACHERS, key=len, reverse=True)
     rows = defaultdict(list)
+    room_start = None
+    text_start = None
     group_pattern = re.compile(r'(?:4º ESO [AB]|ESO [1-4][AB]|BAC [12][AB])(?:,(?:4º ESO [AB]|ESO [1-4][AB]|BAC [12][AB]))*')
     row_pattern = re.compile(r'^\s*(Lu|Ma|Mi|Ju|Vi)\s+(\d{2}:\d{2})\s+(\d{2}:\d{2})\s+(.+)$')
 
     for line in lines:
+        if 'Aulas' in line and 'Día' in line:
+            room_start = line.index('Aulas')
+            text_start = line.find('Texto clase')
+            if text_start < 0:
+                text_start = None
+            continue
         match = row_pattern.match(line.replace('\f', ''))
         if not match:
             continue
@@ -132,16 +140,21 @@ def parse_pdf(pdf_path, pdftotext_bin):
             subject = rest[:group_match.start()].strip()
             groups = group_match.group(0).strip()
             room = rest[group_match.end():].strip()
+            class_text = ''
         else:
             room_match = re.search(r'\s{2,}([A-Z][A-Z0-9.]+)$', rest)
             room = room_match.group(1) if room_match else ''
             subject = rest[:room_match.start()].strip() if room_match else rest
             groups = ''
+            class_text = ''
+        if room_start is not None:
+            room = line[room_start:text_start].strip() if text_start is not None else line[room_start:].strip()
+            class_text = line[text_start:].strip() if text_start is not None else ''
         if not subject:
             continue
-        rows[teacher].append({'day': day, 'start': start, 'end': end, 'subject': subject, 'groups': groups, 'room': room})
+        rows[teacher].append({'day': day, 'start': start, 'end': end, 'subject': subject, 'groups': groups, 'room': room, 'class_text': class_text})
     for teacher in rows:
-        unique = {(lesson['day'], lesson['start'], lesson['end'], lesson['subject'], lesson['groups'], lesson['room']): lesson for lesson in rows[teacher]}
+        unique = {(lesson['day'], lesson['start'], lesson['end'], lesson['subject'], lesson['groups'], lesson['room'], lesson['class_text']): lesson for lesson in rows[teacher]}
         rows[teacher] = list(unique.values())
     return rows, publication_stamp
 
@@ -154,6 +167,8 @@ def lesson_cell(lesson):
         details.append(f"<i>{html.escape(lesson['groups'])}</i>")
     if lesson['room']:
         details.append(f"<small>{html.escape(lesson['room'])}</small>")
+    if lesson['class_text']:
+        details.append(f'<i class="class-text">{html.escape(lesson["class_text"])}</i>')
     return f'<td class="lesson-color-{color}"><div class="lesson">{"<br>".join(details)}</div></td>'
 
 
