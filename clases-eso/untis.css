@@ -516,6 +516,13 @@ table.generated-timetable col.day-column {
     width: 18.2%;
 }
 
+table.generated-timetable .class-text {
+    display: block;
+    margin-top: 2px;
+    text-align: right;
+    font-style: italic;
+}
+
 body > center > table[border="3"][rules="all"] {
     width: 100%;
     table-layout: fixed;
