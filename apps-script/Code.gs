@@ -373,6 +373,15 @@ body > center {
   padding-left: 0 !important;
   padding-right: 0 !important;
 }
+body > center[style] {
+  width: 100% !important;
+  max-width: none !important;
+}
+body > center > table.generated-timetable {
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: none !important;
+}
 body > center > table[border="3"][rules="all"] {
   width: 100% !important;
   max-width: 100% !important;
