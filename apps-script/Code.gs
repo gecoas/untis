@@ -300,7 +300,7 @@ function classPathFromTutor_(value, sheetName) {
   if (match && isSecondarySheet_(sheetName)) {
     return 'clases-eso/Clases_ESO_' + match[1] + match[2].toUpperCase() + '.htm';
   }
-  match = normalized.match(/\b([12])\s*(?:o\s*)?(?:bachillerato|bahcillerato|bach|bac)\s*([ab])\b/) || normalized.match(/\b(?:bachillerato|bahcillerato|bach|bac)\s*([12])\s*(?:o\s*)?([ab])\b/);
+  match = normalized.match(/\b([12])\s*(?:o|a)?\s*(?:bachillerato|bahcillerato|bach|bac)\s*([ab])\b/) || normalized.match(/\b(?:bachillerato|bahcillerato|bach|bac)\s*([12])\s*(?:o|a)?\s*([ab])\b/);
   if (match && isSecondarySheet_(sheetName)) {
     return 'clases-eso/Clases_BAC_' + match[1] + match[2].toUpperCase() + '.htm';
   }
