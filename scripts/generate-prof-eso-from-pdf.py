@@ -121,6 +121,8 @@ def parse_pdf(pdf_path, pdftotext_bin):
         day, start, end, rest = match.groups()
         if start == '16:05':
             continue
+        if (start, end) == ('15:00', '15:50'):
+            start, end = '15:05', '16:00'
         teacher = next((name for name in teachers if rest.startswith(name)), None)
         if not teacher:
             continue
@@ -166,6 +168,7 @@ def build_html(display_name, lessons, previous_file, next_file, stage_slots, pub
         selected_slots.update(stage_slots['upper'])
     if has_lower and has_upper:
         selected_slots.update(stage_slots['upper'])
+    selected_slots.add(('15:05', '16:00'))
     slots = sorted(selected_slots | {(lesson['start'], lesson['end']) for lesson in lessons})
     by_slot = defaultdict(list)
     for lesson in lessons:
