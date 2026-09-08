@@ -209,6 +209,21 @@ def build_html(display_name, lessons, previous_file, next_file, stage_slots, pub
 </html>'''
 
 
+def update_professor_index(output, publication_stamp):
+    index = Path(output) / 'Profesores.htm'
+    if not index.exists():
+        return
+    content = index.read_text(encoding='utf-8', errors='replace')
+    content = re.sub(
+        r'(<TD\s+align="right">)\s*\d{1,2}/\d{1,2}/\d{4}\s+\d{1,2}:\d{2}',
+        lambda match: match.group(1) + publication_stamp,
+        content,
+        count=1,
+        flags=re.IGNORECASE,
+    )
+    index.write_text(content, encoding='utf-8')
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--pdf', required=True)
@@ -230,6 +245,7 @@ def main():
         previous_file = teacher_items[index - 1][1][1] if index else None
         next_file = teacher_items[index + 1][1][1] if index + 1 < len(teacher_items) else None
         (output / filename).write_text(build_html(display_name, lessons, previous_file, next_file, stage_slots, publication_stamp), encoding='utf-8')
+    update_professor_index(output, publication_stamp)
     print(f'Generados {sum(bool(rows.get(teacher)) for teacher in TEACHERS)} horarios de profesores en {output}')
 
 
