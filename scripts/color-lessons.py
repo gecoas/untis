@@ -100,10 +100,11 @@ def color_file(path: Path) -> bool:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument('--root', default=str(Path(__file__).resolve().parent.parent))
+    parser.add_argument('--folder', action='append', dest='folders')
     args = parser.parse_args()
     root = Path(args.root)
     changed = 0
-    for folder in TARGETS:
+    for folder in args.folders or TARGETS:
         directory = root / folder
         if not directory.is_dir():
             continue

@@ -30,7 +30,7 @@ jobs:
             --pdftotext "$(command -v pdftotext)"
           cp untis.css prof-eso/untis.css
           python3 scripts/prepare-horarios.py --folder prof-eso
-          python3 scripts/color-lessons.py --root .
+          python3 scripts/color-lessons.py --root . --folder prof-eso
 
       - name: Publicar cambios generados
         run: |
