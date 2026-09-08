@@ -292,11 +292,11 @@ function matchProfessor_(name, sheetName) {
 function classPathFromTutor_(value, sheetName) {
   if (!value) return null;
   const normalized = normalize_(value);
-  let match = normalized.match(/\b([1-6])\s*o?\s*([ab])\b/);
+  let match = normalized.match(/\b([1-6])\s*(?:o|a)?\s*primaria\s*([ab])\b/) || normalized.match(/\b([1-6])\s*(?:o|a)?\s*([ab])\s*primaria\b/) || normalized.match(/\b([1-6])\s*(?:o|a)?\s*([ab])\b/);
   if (match && normalized.indexOf('primaria') !== -1 && isPrimarySheet_(sheetName)) {
     return 'clases-pri/Clases_PRI_' + match[1] + match[2].toUpperCase() + '.htm';
   }
-  match = normalized.match(/\b([1-4])\s*o?\s*eso\s*([ab])\b/) || normalized.match(/\b([1-4])\s*o?\s*([ab])\s*eso\b/);
+  match = normalized.match(/\b([1-4])\s*(?:o|a)?\s*eso\s*([ab])\b/) || normalized.match(/\b([1-4])\s*(?:o|a)?\s*([ab])\s*eso\b/);
   if (match && isSecondarySheet_(sheetName)) {
     return 'clases-eso/Clases_ESO_' + match[1] + match[2].toUpperCase() + '.htm';
   }
