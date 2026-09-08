@@ -104,6 +104,10 @@ def load_stage_slots(class_folder):
 
 def parse_pdf(pdf_path, pdftotext_bin):
     lines = extract_pdf_lines(pdf_path, pdftotext_bin)
+    publication_stamp = next(
+        (match.group(0) for line in lines for match in [re.search(r'\b\d{1,2}/\d{1,2}/\d{4}\s+\d{1,2}:\d{2}\b', line)] if match),
+        '',
+    )
 
     teachers = sorted(TEACHERS, key=len, reverse=True)
     rows = defaultdict(list)
@@ -137,7 +141,7 @@ def parse_pdf(pdf_path, pdftotext_bin):
     for teacher in rows:
         unique = {(lesson['day'], lesson['start'], lesson['end'], lesson['subject'], lesson['groups'], lesson['room']): lesson for lesson in rows[teacher]}
         rows[teacher] = list(unique.values())
-    return rows
+    return rows, publication_stamp
 
 
 def lesson_cell(lesson):
@@ -151,7 +155,7 @@ def lesson_cell(lesson):
     return f'<td class="lesson-color-{color}"><div class="lesson">{"<br>".join(details)}</div></td>'
 
 
-def build_html(display_name, lessons, previous_file, next_file, stage_slots):
+def build_html(display_name, lessons, previous_file, next_file, stage_slots, publication_stamp):
     groups = ','.join(lesson['groups'] for lesson in lessons)
     has_lower = bool(re.search(r'ESO [12][AB]', groups))
     has_upper = bool(re.search(r'ESO [34][AB]|4º ESO [AB]|BAC [12][AB]', groups))
@@ -195,7 +199,7 @@ def build_html(display_name, lessons, previous_file, next_file, stage_slots):
 </head>
 <body class=tt>
 <CENTER><div class="home-link-wrap"><a class="home-link" href="../index.html">&#8592; Volver al inicio</a></div><font size="3" face="Arial" color="#000000">
-<TABLE border="0" cellpadding="1"><TR><TD rowspan="2" width="5"></TD><TD><b>COAS</b></TD><TD rowspan="2" width="5"></TD><TD>Curso 2026-2027</TD><TD rowspan="2" width="5"></TD><TD align="right"><b>Untis 2027</b></TD><TD rowspan="2" width="5"></TD></TR><TR><TD>ES-Leioa</TD><TD>Alcaste - Las Fuentes</TD><TD align="right">3/9/2026 19:00</TD></TR></TABLE><BR></font>
+<TABLE border="0" cellpadding="1"><TR><TD rowspan="2" width="5"></TD><TD><b>COAS</b></TD><TD rowspan="2" width="5"></TD><TD>Curso 2026-2027</TD><TD rowspan="2" width="5"></TD><TD align="right"><b>Untis 2027</b></TD><TD rowspan="2" width="5"></TD></TR><TR><TD>ES-Leioa</TD><TD>Alcaste - Las Fuentes</TD><TD align="right">{html.escape(publication_stamp)}</TD></TR></TABLE><BR></font>
 <font size="4" face="Arial"><B>{html.escape(display_name)}</B></font>
 <div class="top-nav">{previous_link}<A HREF="Profesores.htm"><span class="nav-icon nav-home">&#127968;</span></A>{next_link}</div><div class="print-actions"><button type="button" class="print-action" onclick="window.print()">Descargar PDF</button><button type="button" class="print-action" onclick="window.print()">Imprimir</button></div><BR>
 <TABLE border="3" rules="all" cellpadding="1" cellspacing="1" class="generated-timetable"><COLGROUP><COL class="time-column"><COL span="5" class="day-column"></COLGROUP><TR><TD align="center">Hora</TD>{''.join(f'<TD colspan="1" align="center"><B>{name}</B></TD>' for name in [DAY_NAMES[day] for day in DAY_ORDER])}</TR>{''.join(body)}</TABLE>
@@ -214,7 +218,8 @@ def main():
     args = parser.parse_args()
     output = Path(args.output)
     output.mkdir(parents=True, exist_ok=True)
-    rows = parse_pdf(Path(args.pdf), args.pdftotext)
+    rows, publication_stamp = parse_pdf(Path(args.pdf), args.pdftotext)
+    publication_stamp = publication_stamp or '3/9/2026 19:00'
     stage_slots = load_stage_slots(args.class_folder) if args.class_folder else DEFAULT_STAGE_SLOTS
     teacher_items = list(TEACHERS.items())
     for index, (teacher, (display_name, filename)) in enumerate(teacher_items):
@@ -224,7 +229,7 @@ def main():
             continue
         previous_file = teacher_items[index - 1][1][1] if index else None
         next_file = teacher_items[index + 1][1][1] if index + 1 < len(teacher_items) else None
-        (output / filename).write_text(build_html(display_name, lessons, previous_file, next_file, stage_slots), encoding='utf-8')
+        (output / filename).write_text(build_html(display_name, lessons, previous_file, next_file, stage_slots, publication_stamp), encoding='utf-8')
     print(f'Generados {sum(bool(rows.get(teacher)) for teacher in TEACHERS)} horarios de profesores en {output}')
 
 
