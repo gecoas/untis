@@ -111,6 +111,8 @@ def parse_pdf(pdf_path, pdftotext_bin):
 
     teachers = sorted(TEACHERS, key=len, reverse=True)
     rows = defaultdict(list)
+    subject_start = None
+    group_start = None
     room_start = None
     text_start = None
     group_pattern = re.compile(r'(?:4º ESO [AB]|ESO [1-4][AB]|BAC [12][AB])(?:,(?:4º ESO [AB]|ESO [1-4][AB]|BAC [12][AB]))*')
@@ -118,6 +120,8 @@ def parse_pdf(pdf_path, pdftotext_bin):
 
     for line in lines:
         if 'Aulas' in line and 'Día' in line:
+            subject_start = line.index('Materia')
+            group_start = line.index('Grupo(s)')
             room_start = line.index('Aulas')
             text_start = line.find('Texto clase')
             if text_start < 0:
@@ -136,7 +140,12 @@ def parse_pdf(pdf_path, pdftotext_bin):
             continue
         rest = rest[len(teacher):].strip()
         group_match = group_pattern.search(rest)
-        if group_match:
+        if subject_start is not None and group_start is not None and room_start is not None:
+            subject = line[subject_start:group_start].strip()
+            groups = line[group_start:room_start].strip()
+            room = line[room_start:text_start].strip() if text_start is not None else line[room_start:].strip()
+            class_text = line[text_start:].strip() if text_start is not None else ''
+        elif group_match:
             subject = rest[:group_match.start()].strip()
             groups = group_match.group(0).strip()
             room = rest[group_match.end():].strip()
