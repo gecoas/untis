@@ -178,7 +178,7 @@ def lesson_cell(lesson):
         details.append(f"<small>{html.escape(lesson['room'])}</small>")
     if lesson['class_text']:
         details.append(f'<i class="class-text">{html.escape(lesson["class_text"])}</i>')
-    return f'<td class="lesson-color-{color}"><div class="lesson">{"<br>".join(details)}</div></td>'
+    return f'<td colspan="12" class="lesson-color-{color}"><div class="lesson">{"<br>".join(details)}</div></td>'
 
 
 def build_html(display_name, lessons, previous_file, next_file, stage_slots, publication_stamp):
@@ -207,11 +207,11 @@ def build_html(display_name, lessons, previous_file, next_file, stage_slots, pub
             if len(day_lessons) == 1:
                 cells.append(lesson_cell(day_lessons[0]))
             elif day_lessons:
-                cells.append('<td class="lesson-stack">' + '<br>'.join(
+                cells.append('<td colspan="12" class="lesson-stack">' + '<br>'.join(
                     html.escape(lesson['subject'] + ' ' + lesson['groups']) for lesson in day_lessons
                 ) + '</td>')
             else:
-                cells.append('<td></td>')
+                cells.append('<td colspan="12"></td>')
         body.append('<tr>' + ''.join(cells) + '</tr>')
 
     previous_link = f'<A HREF="{previous_file}"><span class="nav-icon nav-prev">&#8592;</span></A>' if previous_file else ''
@@ -229,7 +229,7 @@ def build_html(display_name, lessons, previous_file, next_file, stage_slots, pub
 <TABLE border="0" cellpadding="1"><TR><TD rowspan="2" width="5"></TD><TD><b>COAS</b></TD><TD rowspan="2" width="5"></TD><TD>Curso 2026-2027</TD><TD rowspan="2" width="5"></TD><TD align="right"><b>Untis 2027</b></TD><TD rowspan="2" width="5"></TD></TR><TR><TD>ES-Leioa</TD><TD>Alcaste - Las Fuentes</TD><TD align="right">{html.escape(publication_stamp)}</TD></TR></TABLE><BR></font>
 <font size="4" face="Arial"><B>{html.escape(display_name)}</B></font>
 <div class="top-nav">{previous_link}<A HREF="Profesores.htm"><span class="nav-icon nav-home">&#127968;</span></A>{next_link}</div><div class="print-actions"><button type="button" class="print-action" onclick="window.print()">Descargar PDF</button><button type="button" class="print-action" onclick="window.print()">Imprimir</button></div><BR>
-<TABLE border="3" rules="all" cellpadding="1" cellspacing="1" width="100%" style="width:100vw;min-width:100vw;max-width:none;table-layout:fixed" class="generated-timetable"><COLGROUP><COL class="time-column"><COL span="5" class="day-column"></COLGROUP><TR><TD align="center">Hora</TD>{''.join(f'<TD colspan="1" align="center"><B>{name}</B></TD>' for name in [DAY_NAMES[day] for day in DAY_ORDER])}</TR>{''.join(body)}</TABLE>
+<TABLE border="3" rules="all" cellpadding="1" cellspacing="1" width="100%" style="width:100vw;min-width:100vw;max-width:none;table-layout:fixed" class="generated-timetable"><TR><TD align="center">Hora</TD>{''.join(f'<TD colspan="12" align="center"><B>{name}</B></TD>' for name in [DAY_NAMES[day] for day in DAY_ORDER])}</TR>{''.join(body)}</TABLE>
 <font size="3" face="Arial">alcaste-lasfuentes.com</font>
 </CENTER>
 </body>
