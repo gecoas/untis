@@ -374,12 +374,13 @@ body > center {
   padding-right: 0 !important;
 }
 body > center[style] {
-  width: 100% !important;
+  display: block !important;
+  width: 100vw !important;
   max-width: none !important;
 }
 body > center > table.generated-timetable {
-  width: 100% !important;
-  min-width: 100% !important;
+  width: 100vw !important;
+  min-width: 100vw !important;
   max-width: none !important;
 }
 body > center > table[border="3"][rules="all"] {
