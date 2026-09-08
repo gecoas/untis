@@ -39,6 +39,19 @@ TEACHERS = {
 DAY_NAMES = {'Lu': 'Lunes', 'Ma': 'Martes', 'Mi': 'Miércoles', 'Ju': 'Jueves', 'Vi': 'Viernes'}
 DAY_ORDER = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi']
 COLOR_COUNT = 20
+DEFAULT_STAGE_SLOTS = {
+    'lower': {
+        ('09:15', '10:05'), ('10:05', '10:55'), ('10:55', '11:25'),
+        ('11:25', '11:50'), ('11:50', '12:40'), ('12:40', '13:30'),
+        ('13:30', '13:55'), ('13:55', '14:15'), ('14:15', '15:05'),
+        ('15:05', '16:00'),
+    },
+    'upper': {
+        ('08:15', '09:15'), ('09:15', '10:05'), ('10:05', '10:55'),
+        ('10:55', '11:25'), ('11:25', '11:50'), ('11:50', '12:40'),
+        ('12:40', '13:30'), ('13:30', '14:25'),
+    },
+}
 
 
 def normalize(value):
@@ -74,6 +87,19 @@ def extract_pdf_lines(pdf_path, pdftotext_bin):
             text = page.extract_text()
         lines.extend((text or '').splitlines())
     return lines
+
+
+def load_stage_slots(class_folder):
+    stage_slots = {'lower': set(), 'upper': set()}
+    time_pattern = re.compile(r'<font\s+size=["\']?2["\']?\s+face=["\']Arial["\']?[^>]*>\s*(\d{1,2}:\d{2})\s*</font>', re.IGNORECASE)
+    for path in Path(class_folder).glob('Clases_*.htm'):
+        stage = 'lower' if re.search(r'Clases_ESO_[12][AB]\.htm$', path.name) else 'upper'
+        times = time_pattern.findall(path.read_text(encoding='utf-8', errors='replace'))
+        for start, end in zip(times[::2], times[1::2]):
+            pair = (start.zfill(5), end.zfill(5))
+            if pair != ('16:05', '16:30'):
+                stage_slots[stage].add(pair)
+    return stage_slots if all(stage_slots.values()) else DEFAULT_STAGE_SLOTS
 
 
 def parse_pdf(pdf_path, pdftotext_bin):
@@ -125,8 +151,18 @@ def lesson_cell(lesson):
     return f'<td class="lesson-color-{color}"><div class="lesson">{"<br>".join(details)}</div></td>'
 
 
-def build_html(display_name, lessons, previous_file, next_file):
-    slots = sorted({(lesson['start'], lesson['end']) for lesson in lessons})
+def build_html(display_name, lessons, previous_file, next_file, stage_slots):
+    groups = ','.join(lesson['groups'] for lesson in lessons)
+    has_lower = bool(re.search(r'ESO [12][AB]', groups))
+    has_upper = bool(re.search(r'ESO [34][AB]|4º ESO [AB]|BAC [12][AB]', groups))
+    selected_slots = set()
+    if has_lower:
+        selected_slots.update(stage_slots['lower'])
+    if has_upper or not selected_slots:
+        selected_slots.update(stage_slots['upper'])
+    if has_lower and has_upper:
+        selected_slots.update(stage_slots['upper'])
+    slots = sorted(selected_slots | {(lesson['start'], lesson['end']) for lesson in lessons})
     by_slot = defaultdict(list)
     for lesson in lessons:
         by_slot[(lesson['day'], lesson['start'], lesson['end'])].append(lesson)
@@ -173,11 +209,13 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--pdf', required=True)
     parser.add_argument('--output', required=True)
+    parser.add_argument('--class-folder', default='')
     parser.add_argument('--pdftotext', default='pdftotext')
     args = parser.parse_args()
     output = Path(args.output)
     output.mkdir(parents=True, exist_ok=True)
     rows = parse_pdf(Path(args.pdf), args.pdftotext)
+    stage_slots = load_stage_slots(args.class_folder) if args.class_folder else DEFAULT_STAGE_SLOTS
     teacher_items = list(TEACHERS.items())
     for index, (teacher, (display_name, filename)) in enumerate(teacher_items):
         lessons = rows.get(teacher, [])
@@ -186,7 +224,7 @@ def main():
             continue
         previous_file = teacher_items[index - 1][1][1] if index else None
         next_file = teacher_items[index + 1][1][1] if index + 1 < len(teacher_items) else None
-        (output / filename).write_text(build_html(display_name, lessons, previous_file, next_file), encoding='utf-8')
+        (output / filename).write_text(build_html(display_name, lessons, previous_file, next_file, stage_slots), encoding='utf-8')
     print(f'Generados {sum(bool(rows.get(teacher)) for teacher in TEACHERS)} horarios de profesores en {output}')
 
 

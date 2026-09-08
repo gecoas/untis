@@ -27,6 +27,7 @@ jobs:
           python3 scripts/generate-prof-eso-from-pdf.py \
             --pdf docs/horarios-listado.pdf \
             --output prof-eso \
+            --class-folder clases-eso \
             --pdftotext "$(command -v pdftotext)"
           cp untis.css prof-eso/untis.css
           python3 scripts/prepare-horarios.py --folder prof-eso
