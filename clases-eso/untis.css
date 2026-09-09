@@ -508,6 +508,14 @@ table.generated-timetable {
     table-layout: fixed;
 }
 
+@media print {
+    body > center > table.generated-timetable {
+        width: 100vw !important;
+        min-width: 100vw !important;
+        max-width: none !important;
+    }
+}
+
 table.generated-timetable col.time-column {
     width: 9%;
 }
