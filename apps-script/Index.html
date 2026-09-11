@@ -159,6 +159,7 @@
 
   <div class="toolbar">
     <button onclick="loadRows()">Cargar lista</button>
+    <button class="secondary" onclick="selectAllRows()">Seleccionar todos</button>
     <button onclick="sendSelectedRows()">Enviar seleccionados</button>
   </div>
 
@@ -248,6 +249,12 @@ Un saludo.</textarea>
       activeSheet = sheetName;
       render();
       setStatus('Mostrando ' + sheetName + '.');
+    }
+
+    function selectAllRows() {
+      const checkboxes = document.querySelectorAll('#app tbody input[type="checkbox"]:not(:disabled)');
+      checkboxes.forEach((checkbox) => { checkbox.checked = true; });
+      setStatus('Seleccionados ' + checkboxes.length + ' horarios de ' + activeSheet + '.');
     }
 
     function selectorsHtml(row) {
