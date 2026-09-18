@@ -417,7 +417,11 @@ function getPdfFolder_() {
 }
 
 function getBaseUrl_() {
-  return (PropertiesService.getScriptProperties().getProperty('SITE_BASE_URL') || DEFAULT_SITE_BASE_URL).replace(/\/$/, '');
+  let baseUrl = (PropertiesService.getScriptProperties().getProperty('SITE_BASE_URL') || DEFAULT_SITE_BASE_URL).replace(/\/$/, '');
+  if (baseUrl === 'https://gecoas.github.io') {
+    baseUrl += '/untis';
+  }
+  return baseUrl;
 }
 
 function normalize_(value) {
