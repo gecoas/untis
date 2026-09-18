@@ -87,9 +87,10 @@ function doGet() {
 }
 
 function getRows() {
+  const professorTimetables = getProfessorTimetables_();
   return {
-    rows: readPeople_().map(buildRow_),
-    professorOptions: PROFESSOR_TIMETABLES.map(([title, path]) => ({ title, path })),
+    rows: readPeople_().map((row) => buildRow_(row, professorTimetables)),
+    professorOptions: professorTimetables.map(([title, path]) => ({ title, path })),
     classOptions: CLASS_TIMETABLES.map(([title, path]) => ({ title, path }))
   };
 }
@@ -141,13 +142,13 @@ function normalizeEmailBody_(emailBody) {
   return body;
 }
 
-function buildRow_(row) {
-  const professorMatch = matchProfessor_(row.profesor, row.sheetName);
+function buildRow_(row, professorTimetables) {
+  const professorMatch = matchProfessor_(row.profesor, row.sheetName, professorTimetables);
   const classPath = classPathFromTutor_(row.tutorDe, row.sheetName);
   const attachments = buildAttachments_(row, {
     professorPath: professorMatch ? professorMatch.path : '',
     classPath: classPath || ''
-  });
+  }, professorTimetables);
   return {
     id: row.id,
     sheetName: row.sheetName,
@@ -161,7 +162,7 @@ function buildRow_(row) {
       path: attachment.path,
       fileName: attachment.fileName
     })),
-    warnings: buildWarnings_(row, attachments)
+    warnings: buildWarnings_(row, attachments, professorTimetables)
   };
 }
 
@@ -215,12 +216,12 @@ function findRow_(rowId) {
   return row;
 }
 
-function buildAttachments_(row, overrides) {
+function buildAttachments_(row, overrides, professorTimetables) {
   overrides = overrides || {};
   const attachments = [];
   const professorPath = Object.prototype.hasOwnProperty.call(overrides, 'professorPath')
     ? overrides.professorPath
-    : (matchProfessor_(row.profesor, row.sheetName) || {}).path;
+    : (matchProfessor_(row.profesor, row.sheetName, professorTimetables) || {}).path;
   if (professorPath) {
     findProfessorOption_(professorPath);
     attachments.push({
@@ -243,9 +244,9 @@ function buildAttachments_(row, overrides) {
   return attachments;
 }
 
-function buildWarnings_(row, attachments) {
+function buildWarnings_(row, attachments, professorTimetables) {
   const warnings = [];
-  if (!matchProfessor_(row.profesor, row.sheetName)) {
+  if (!matchProfessor_(row.profesor, row.sheetName, professorTimetables)) {
     warnings.push('No se ha encontrado horario de profesor');
   }
   if (row.tutorDe && !classPathFromTutor_(row.tutorDe, row.sheetName)) {
@@ -258,11 +259,33 @@ function buildWarnings_(row, attachments) {
 }
 
 function findProfessorOption_(path) {
-  const match = PROFESSOR_TIMETABLES.find((entry) => entry[1] === path);
+  const match = getProfessorTimetables_().find((entry) => entry[1] === path);
   if (!match) {
     throw new Error('Archivo de profesor no permitido: ' + path);
   }
   return { title: match[0], path: match[1] };
+}
+
+function getProfessorTimetables_() {
+  const discovered = [];
+  const seen = {};
+  PROFESSOR_TIMETABLES.forEach((entry) => {
+    seen[entry[1]] = true;
+    discovered.push(entry);
+  });
+  ['prof-pri/Profesores.htm', 'prof-eso/Profesores.htm'].forEach((indexPath) => {
+    const html = UrlFetchApp.fetch(getBaseUrl_() + '/' + indexPath).getContentText('UTF-8');
+    const folder = indexPath.split('/')[0];
+    const links = html.matchAll(/<A\s+HREF="(Profesores_[^"]+\.htm)">\s*([^<]+?)\s*<\/A>/gi);
+    for (const match of links) {
+      const path = folder + '/' + match[1];
+      if (!seen[path]) {
+        seen[path] = true;
+        discovered.push([match[2].trim(), path]);
+      }
+    }
+  });
+  return discovered;
 }
 
 function findClassOption_(path) {
@@ -273,11 +296,11 @@ function findClassOption_(path) {
   return { title: match[0], path: match[1] };
 }
 
-function matchProfessor_(name, sheetName) {
+function matchProfessor_(name, sheetName, timetables) {
   const wanted = tokens_(name);
   let best = null;
   let bestScore = 0;
-  filterTimetablesForSheet_(PROFESSOR_TIMETABLES, sheetName).forEach(([title, path]) => {
+  filterTimetablesForSheet_(timetables || getProfessorTimetables_(), sheetName).forEach(([title, path]) => {
     const available = tokens_(title);
     const overlap = wanted.filter((token) => available.some((candidate) => tokenMatches_(token, candidate))).length;
     const score = Math.max(overlap / Math.max(wanted.length, 1), overlap / Math.max(available.length, 1));
