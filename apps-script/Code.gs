@@ -274,7 +274,7 @@ function getProfessorTimetables_() {
     discovered.push(entry);
   });
   ['prof-pri/Profesores.htm', 'prof-eso/Profesores.htm'].forEach((indexPath) => {
-    const html = UrlFetchApp.fetch(getBaseUrl_() + '/' + indexPath).getContentText('UTF-8');
+    const html = fetchText_(getBaseUrl_() + '/' + indexPath);
     const folder = indexPath.split('/')[0];
     const links = html.matchAll(/<A\s+HREF="(Profesores_[^"]+\.htm)">\s*([^<]+?)\s*<\/A>/gi);
     for (const match of links) {
@@ -385,8 +385,8 @@ function buildPrintableHtml_(path) {
   const pageUrl = baseUrl + '/' + path;
   const folderPath = path.split('/').slice(0, -1).join('/');
   const cssUrl = baseUrl + '/' + folderPath + '/untis.css';
-  let html = UrlFetchApp.fetch(pageUrl).getContentText('UTF-8');
-  const css = UrlFetchApp.fetch(cssUrl).getContentText('UTF-8');
+  let html = fetchText_(pageUrl);
+  const css = fetchText_(cssUrl);
   html = html.replace(/<link\s+rel="stylesheet"\s+type="text\/css"\s+href="untis\.css"\s*>/i, '<style>' + css + '</style>');
   html = html.replace('</head>', `<style>
 body > center {
@@ -440,11 +440,23 @@ function getPdfFolder_() {
 }
 
 function getBaseUrl_() {
-  let baseUrl = (PropertiesService.getScriptProperties().getProperty('SITE_BASE_URL') || DEFAULT_SITE_BASE_URL).replace(/\/$/, '');
-  if (baseUrl === 'https://gecoas.github.io') {
+  let baseUrl = String(
+    PropertiesService.getScriptProperties().getProperty('SITE_BASE_URL') || DEFAULT_SITE_BASE_URL
+  ).trim().replace(/\/+$/, '');
+  if (/^https:\/\/gecoas\.github\.io$/i.test(baseUrl)) {
     baseUrl += '/untis';
   }
   return baseUrl;
+}
+
+
+function fetchText_(url) {
+  const response = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
+  const code = response.getResponseCode();
+  if (code < 200 || code >= 300) {
+    throw new Error('No se pudo cargar ' + url + ' (HTTP ' + code + ')');
+  }
+  return response.getContentText('UTF-8');
 }
 
 function normalize_(value) {
