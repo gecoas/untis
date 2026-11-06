@@ -49,7 +49,8 @@ const PROFESSOR_TIMETABLES = [
   ['Bibián Lamarca Miche', 'prof-eso/Profesores_Mich.htm'],
   ['Ortiz Martínez Patri', 'prof-eso/Profesores_Pat2.htm'],
   ['Ruiz Lucendo Ramón', 'prof-eso/Profesores_Ramf3.htm'],
-  ['Fernández Martínez S', 'prof-eso/Profesores_Susa.htm']
+  ['Fernández Martínez S', 'prof-eso/Profesores_Susa.htm'],
+  ['Carrera Romero Jorda', 'prof-eso/Profesores_Jord.htm']
 ];
 
 const CLASS_TIMETABLES = [
