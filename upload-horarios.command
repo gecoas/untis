@@ -135,8 +135,11 @@ if git diff --cached --quiet; then
   exit 0
 fi
 
-if git diff --cached --name-status -- clases-pri prof-pri clases-eso prof-eso | grep -q '^D'; then
-  fail "Git detecta borrados de horarios. No se crea commit para evitar borrar horarios en GitHub."
+deleted_files="$(git diff --cached --name-status -- clases-pri prof-pri clases-eso prof-eso | awk '$1 == "D" { print $2 }')"
+if [[ -n "$deleted_files" ]]; then
+  log "Archivos que desaparecerian de GitHub:"
+  log "$deleted_files"
+  fail "Git detecta borrados de horarios. No se crea commit para evitar borrar horarios en GitHub. Vuelve a exportar esos horarios desde Untis o revisa la carpeta de origen."
 fi
 
 log "Archivos que se van a subir:"
