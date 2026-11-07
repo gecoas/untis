@@ -31,7 +31,7 @@ def fix_mojibake(content: str) -> str:
         'Pl�stica': 'Plástica', 'Geograf�a': 'Geografía', 'Orientaci�n': 'Orientación',
         'Dibujo T�cnico': 'Dibujo Técnico', 'H� Filosof�a': 'Hª Filosofía', 'H� Mundo': 'Hª Mundo', 'Filosof�a': 'Filosofía',
         'Econom�a': 'Economía', 'Programaci�n': 'Programación', 'Mar�a': 'María',
-        'M� Jesús': 'Mª Jesús', 'Jes�s': 'Jesús', 'Geolog�a': 'Geología',
+        'M� Jesús': 'Mª Jesús', 'Jes�s': 'Jesús', 'J�ssica': 'Jéssica', 'Geolog�a': 'Geología',
         'Tutor�a': 'Tutoría', 'Lat�n': 'Latín', 'Ram�n': 'Ramón', 'Historia Espa�a': 'Historia España',
         'Gesti�n': 'Gestión',
     }
