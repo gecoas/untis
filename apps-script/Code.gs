@@ -1,4 +1,5 @@
 const DEFAULT_SITE_BASE_URL = 'https://gecoas.github.io/untis';
+const HORARIOS_WEB_BASE_URL = 'https://lasfuentes-alcaste.com/horarios';
 const DEFAULT_SHEET_NAMES = ['Primaria', 'ESO/Bach'];
 const DEFAULT_EMAIL_BODY = 'Te adjunto tu/s horario/s correspondientes al curso 2026-2027. Faltan por añadir los encargos, tutorías aula de convivencia, etc. Lo añadiré cuando tengamos cerrada la versión definitiva. Un saludo.';
 
@@ -382,6 +383,120 @@ function createOrReplacePdf_(attachment) {
 }
 
 function buildPrintableHtml_(path) {
+  return buildWebScheduleHtml_(path);
+}
+
+
+function buildWebScheduleHtml_(path) {
+  const target = path.indexOf('prof-') === 0
+    ? { type: 'teacher', title: findProfessorOption_(path).title }
+    : { type: 'group', title: findClassOption_(path).title };
+  const payload = JSON.parse(fetchText_(HORARIOS_WEB_BASE_URL + '/api_horarios.php?colegio=ALF'));
+  const sessions = payload.data || [];
+  const matchingSessions = target.type === 'group'
+    ? sessions.filter((session) => normalize_(session.Grupo_Nombre) === normalize_(target.title))
+    : sessions.filter((session) => session.Persona_Guid === findTeacherGuid_(sessions, target.title));
+  if (!matchingSessions.length) {
+    throw new Error('No hay datos en la web de horarios para ' + target.title);
+  }
+  const slots = sortScheduleSlots_(matchingSessions.map((session) => session.sesion_horaDesde + '-' + session.sesion_horaHasta));
+  const days = [
+    ['Monday', 'Lunes'], ['Tuesday', 'Martes'], ['Wednesday', 'Miércoles'],
+    ['Thursday', 'Jueves'], ['Friday', 'Viernes']
+  ];
+  let table = '<table class="schedule-table"><caption>' + escapeHtml_(target.title) + '</caption><thead><tr><th>Hora</th>';
+  days.forEach((day) => { table += '<th>' + day[1] + '</th>'; });
+  table += '</tr></thead><tbody>';
+  slots.forEach((slot) => {
+    const times = slot.split('-');
+    table += '<tr><th>' + escapeHtml_(times[0]) + '<br>' + escapeHtml_(times[1]) + '</th>';
+    days.forEach((day) => {
+      const cellSessions = matchingSessions.filter((session) =>
+        session.sesion_diaSemana === day[0] &&
+        session.sesion_horaDesde + '-' + session.sesion_horaHasta === slot
+      );
+      if (!cellSessions.length) {
+        table += '<td class="empty"></td>';
+        return;
+      }
+      const first = cellSessions[0];
+      const colorKey = target.type === 'group' ? first.Materia_Nombre : first.Grupo_Nombre;
+      table += '<td class="session-cell" style="background-color:' + scheduleColor_(colorKey) + '">';
+      const unique = {};
+      cellSessions.forEach((session) => {
+        const subject = session.Materia_Nombre || 'Sin materia';
+        const detail = target.type === 'group'
+          ? scheduleTeacherName_(session)
+          : [session.Grupo_Nombre, session.Aula_Nombre, session.Texto_Clase]
+            .filter(Boolean).join(' ');
+        const key = subject + '\u0000' + detail;
+        if (!unique[key]) {
+          unique[key] = true;
+          table += '<div><span class="subject">' + escapeHtml_(subject) + '</span>' +
+            '<span class="' + (target.type === 'group' ? 'teacher' : 'group') + '">' +
+            escapeHtml_(detail) + '</span></div>';
+        }
+      });
+      table += '</td>';
+    });
+    table += '</tr>';
+  });
+  table += '</tbody></table>';
+  const css = fetchText_(HORARIOS_WEB_BASE_URL + '/style.css?v=20261021d');
+  return '<!doctype html><html lang="es"><head><meta charset="UTF-8"><style>' + css +
+    '</style><style>@page{size:landscape;margin:1cm}body{background:#fff}main{max-width:none;margin:0;padding:0}.schedule-table{width:100%;font-size:10pt}.schedule-table caption{position:static}.schedule-table thead th{position:static}</style></head><body><main><div class="tables-container">' +
+    table + '</div></main></body></html>';
+}
+
+
+function findTeacherGuid_(sessions, title) {
+  const teachers = {};
+  sessions.forEach((session) => {
+    if (!session.Persona_Guid) return;
+    teachers[session.Persona_Guid] = scheduleTeacherName_(session);
+  });
+  let bestGuid = null;
+  let bestScore = 0;
+  Object.keys(teachers).forEach((guid) => {
+    const wanted = tokens_(title);
+    const available = tokens_(teachers[guid]);
+    const overlap = wanted.filter((token) => available.some((candidate) => tokenMatches_(token, candidate))).length;
+    const score = Math.max(overlap / Math.max(wanted.length, 1), overlap / Math.max(available.length, 1));
+    if (score > bestScore) {
+      bestScore = score;
+      bestGuid = guid;
+    }
+  });
+  return bestGuid;
+}
+
+
+function scheduleTeacherName_(session) {
+  return [session.Persona_Nombre, session.Persona_Apellido1, session.Persona_Apellido2]
+    .filter(Boolean).join(' ').trim();
+}
+
+
+function sortScheduleSlots_(slots) {
+  return [...new Set(slots)].sort((left, right) => left.localeCompare(right, undefined, { numeric: true }));
+}
+
+
+function scheduleColor_(value) {
+  let hash = 0;
+  String(value || 'default').split('').forEach((character) => { hash = character.charCodeAt(0) + ((hash << 5) - hash); });
+  return 'hsl(' + (Math.abs(hash) % 360) + ', 70%, 90%)';
+}
+
+
+function escapeHtml_(value) {
+  return String(value || '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+
+function buildLegacyPrintableHtml_(path) {
   const baseUrl = getBaseUrl_();
   const pageUrl = baseUrl + '/' + path;
   const folderPath = path.split('/').slice(0, -1).join('/');
