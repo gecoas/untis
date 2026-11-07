@@ -275,7 +275,7 @@ function getProfessorTimetables_() {
     discovered.push(entry);
   });
   ['prof-pri/Profesores.htm', 'prof-eso/Profesores.htm'].forEach((indexPath) => {
-    const html = fetchText_(getBaseUrl_() + '/' + indexPath, 'ISO-8859-1');
+    const html = fetchText_(getBaseUrl_() + '/' + indexPath);
     const folder = indexPath.split('/')[0];
     const links = html.matchAll(/<A\s+HREF="(Profesores_[^"]+\.htm)">\s*([^<]+?)\s*<\/A>/gi);
     for (const match of links) {
@@ -386,8 +386,8 @@ function buildPrintableHtml_(path) {
   const pageUrl = baseUrl + '/' + path;
   const folderPath = path.split('/').slice(0, -1).join('/');
   const cssUrl = baseUrl + '/' + folderPath + '/untis.css';
-  let html = fetchText_(pageUrl, 'ISO-8859-1');
-  const css = fetchText_(cssUrl, 'ISO-8859-1');
+  let html = fetchText_(pageUrl);
+  const css = fetchText_(cssUrl);
   html = html.replace(
     /<meta\s+http-equiv="Content-Type"\s+content="text\/html;\s*charset=[^"]+"\s*>/i,
     '<meta charset="UTF-8">'
@@ -455,13 +455,19 @@ function getBaseUrl_() {
 }
 
 
-function fetchText_(url, charset) {
+function fetchText_(url) {
   const response = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
   const code = response.getResponseCode();
   if (code < 200 || code >= 300) {
     throw new Error('No se pudo cargar ' + url + ' (HTTP ' + code + ')');
   }
-  return response.getContentText(charset || 'UTF-8');
+  const utf8 = response.getContentText('UTF-8');
+  const declaration = utf8.match(/charset\s*=\s*["']?\s*([^\s"';>]+)/i);
+  const declared = declaration ? declaration[1].toLowerCase() : '';
+  const encoding = /(?:iso-8859-1|latin1|windows-1252)/.test(declared)
+    ? 'ISO-8859-1'
+    : 'UTF-8';
+  return response.getContentText(encoding);
 }
 
 function normalize_(value) {
