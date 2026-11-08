@@ -421,7 +421,7 @@ function buildWebScheduleHtml_(path) {
       }
       const first = cellSessions[0];
       const colorKey = target.type === 'group' ? first.Materia_Nombre : first.Grupo_Nombre;
-      table += '<td class="session-cell" style="background-color:' + scheduleColor_(colorKey) + '">';
+      table += '<td class="session-cell" style="background-color:' + scheduleColor_(colorKey) + ' !important">';
       const unique = {};
       cellSessions.forEach((session) => {
         const subject = session.Materia_Nombre || 'Sin materia';
@@ -445,7 +445,7 @@ function buildWebScheduleHtml_(path) {
   const css = fetchText_(HORARIOS_WEB_BASE_URL + '/style.css?v=20261021d');
   const generatedAt = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'dd/MM/yyyy HH:mm');
   return '<!doctype html><html lang="es"><head><meta charset="UTF-8"><style>' + css +
-    '</style><style>@page{size:landscape;margin:1cm}body{background:#fff}main{max-width:none;margin:0;padding:0}.schedule-table{width:100%;font-size:10pt}.schedule-table caption{position:static}.schedule-table thead th{position:static}.print-generated-at{display:block;position:fixed;top:0;right:0;color:#555;font-size:9pt}</style></head><body><div class="print-generated-at">Generado: ' + generatedAt + '</div><main><div class="tables-container">' +
+    '</style><style>@page{size:landscape;margin:1cm}*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}body{background:#fff}main{max-width:none;margin:0;padding:0}.schedule-table{width:100%;font-size:10pt}.schedule-table caption{position:static}.schedule-table thead th{position:static}.print-generated-at{display:block;position:fixed;top:0;right:0;color:#555;font-size:9pt}</style></head><body><div class="print-generated-at">Generado: ' + generatedAt + '</div><main><div class="tables-container">' +
     table + '</div></main></body></html>';
 }
 
