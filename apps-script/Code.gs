@@ -443,8 +443,9 @@ function buildWebScheduleHtml_(path) {
   });
   table += '</tbody></table>';
   const css = fetchText_(HORARIOS_WEB_BASE_URL + '/style.css?v=20261021d');
+  const generatedAt = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'dd/MM/yyyy HH:mm');
   return '<!doctype html><html lang="es"><head><meta charset="UTF-8"><style>' + css +
-    '</style><style>@page{size:landscape;margin:1cm}body{background:#fff}main{max-width:none;margin:0;padding:0}.schedule-table{width:100%;font-size:10pt}.schedule-table caption{position:static}.schedule-table thead th{position:static}</style></head><body><main><div class="tables-container">' +
+    '</style><style>@page{size:landscape;margin:1cm}body{background:#fff}main{max-width:none;margin:0;padding:0}.schedule-table{width:100%;font-size:10pt}.schedule-table caption{position:static}.schedule-table thead th{position:static}.print-generated-at{display:block;position:fixed;top:0;right:0;color:#555;font-size:9pt}</style></head><body><div class="print-generated-at">Generado: ' + generatedAt + '</div><main><div class="tables-container">' +
     table + '</div></main></body></html>';
 }
 
@@ -485,7 +486,9 @@ function sortScheduleSlots_(slots) {
 function scheduleColor_(value) {
   let hash = 0;
   String(value || 'default').split('').forEach((character) => { hash = character.charCodeAt(0) + ((hash << 5) - hash); });
-  return 'hsl(' + (Math.abs(hash) % 360) + ', 70%, 90%)';
+  const saturation = 70 + (Math.abs(hash >> 8) % 21);
+  const lightness = 90 + (Math.abs(hash >> 16) % 6);
+  return 'hsl(' + (Math.abs(hash) % 360) + ', ' + saturation + '%, ' + lightness + '%)';
 }
 
 
