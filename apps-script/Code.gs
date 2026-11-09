@@ -1,5 +1,6 @@
 const DEFAULT_SITE_BASE_URL = 'https://gecoas.github.io/untis';
 const HORARIOS_WEB_BASE_URL = 'https://lasfuentes-alcaste.com/horarios';
+const HORARIOS_WEB_DIRECTORY_URL = HORARIOS_WEB_BASE_URL + '/api_profesores_correos.php?colegio=ALF';
 const DEFAULT_SHEET_NAMES = ['Primaria', 'ESO/Bach'];
 const DEFAULT_EMAIL_BODY = 'Te adjunto tu/s horario/s correspondientes al curso 2026-2027. Faltan por añadir los encargos, tutorías aula de convivencia, etc. Lo añadiré cuando tengamos cerrada la versión definitiva. Un saludo.';
 
@@ -90,8 +91,9 @@ function doGet() {
 
 function getRows() {
   const professorTimetables = getProfessorTimetables_();
+  const professorDirectory = getProfessorDirectory_();
   return {
-    rows: readPeople_().map((row) => buildRow_(row, professorTimetables)),
+    rows: readPeople_().map((row) => buildRow_(row, professorTimetables, professorDirectory)),
     professorOptions: professorTimetables.map(([title, path]) => ({ title, path })),
     classOptions: CLASS_TIMETABLES.map(([title, path]) => ({ title, path }))
   };
@@ -144,8 +146,8 @@ function normalizeEmailBody_(emailBody) {
   return body;
 }
 
-function buildRow_(row, professorTimetables) {
-  const professorMatch = matchProfessor_(row.profesor, row.sheetName, professorTimetables);
+function buildRow_(row, professorTimetables, professorDirectory) {
+  const professorMatch = matchProfessor_(row.profesor, row.sheetName, professorTimetables, professorDirectory, row.email);
   const classPath = classPathFromTutor_(row.tutorDe, row.sheetName);
   const attachments = buildAttachments_(row, {
     professorPath: professorMatch ? professorMatch.path : '',
@@ -164,7 +166,7 @@ function buildRow_(row, professorTimetables) {
       path: attachment.path,
       fileName: attachment.fileName
     })),
-    warnings: buildWarnings_(row, attachments, professorTimetables)
+    warnings: buildWarnings_(row, attachments, professorTimetables, professorDirectory)
   };
 }
 
@@ -229,6 +231,7 @@ function buildAttachments_(row, overrides, professorTimetables) {
     attachments.push({
       label: 'Horario profesor',
       path: professorPath,
+      email: row.email,
       fileName: 'profesor-' + safeName_(row.profesor) + '.pdf'
     });
   }
@@ -246,9 +249,9 @@ function buildAttachments_(row, overrides, professorTimetables) {
   return attachments;
 }
 
-function buildWarnings_(row, attachments, professorTimetables) {
+function buildWarnings_(row, attachments, professorTimetables, professorDirectory) {
   const warnings = [];
-  if (!matchProfessor_(row.profesor, row.sheetName, professorTimetables)) {
+  if (!matchProfessor_(row.profesor, row.sheetName, professorTimetables, professorDirectory, row.email)) {
     warnings.push('No se ha encontrado horario de profesor');
   }
   if (row.tutorDe && !classPathFromTutor_(row.tutorDe, row.sheetName)) {
@@ -266,6 +269,12 @@ function findProfessorOption_(path) {
     throw new Error('Archivo de profesor no permitido: ' + path);
   }
   return { title: match[0], path: match[1] };
+}
+
+
+function getProfessorDirectory_() {
+  const payload = JSON.parse(fetchText_(HORARIOS_WEB_DIRECTORY_URL));
+  return payload.directory || [];
 }
 
 function getProfessorTimetables_() {
@@ -298,14 +307,20 @@ function findClassOption_(path) {
   return { title: match[0], path: match[1] };
 }
 
-function matchProfessor_(name, sheetName, timetables) {
-  const wanted = tokens_(name);
+function matchProfessor_(name, sheetName, timetables, directory, email) {
+  const directoryEntry = (directory || []).find((entry) =>
+    String(entry.email || '').trim().toLowerCase() === String(email || '').trim().toLowerCase()
+  );
+  const wantedNames = [tokens_(name)];
+  if (directoryEntry && directoryEntry.scheduleName) wantedNames.push(tokens_(directoryEntry.scheduleName));
   let best = null;
   let bestScore = 0;
   filterTimetablesForSheet_(timetables || getProfessorTimetables_(), sheetName).forEach(([title, path]) => {
     const available = tokens_(title);
-    const overlap = wanted.filter((token) => available.some((candidate) => tokenMatches_(token, candidate))).length;
-    const score = Math.max(overlap / Math.max(wanted.length, 1), overlap / Math.max(available.length, 1));
+    const score = Math.max(...wantedNames.map((wanted) => {
+      const overlap = wanted.filter((token) => available.some((candidate) => tokenMatches_(token, candidate))).length;
+      return Math.max(overlap / Math.max(wanted.length, 1), overlap / Math.max(available.length, 1));
+    }));
     if (score > bestScore) {
       bestScore = score;
       best = { title, path };
@@ -374,7 +389,7 @@ function createOrReplacePdf_(attachment) {
   while (existing.hasNext()) {
     existing.next().setTrashed(true);
   }
-  const html = buildPrintableHtml_(attachment.path);
+  const html = buildPrintableHtml_(attachment);
   const blob = Utilities
     .newBlob(html, 'text/html', attachment.fileName.replace(/\.pdf$/, '.html'))
     .getAs(MimeType.PDF)
@@ -382,20 +397,27 @@ function createOrReplacePdf_(attachment) {
   return folder.createFile(blob);
 }
 
-function buildPrintableHtml_(path) {
-  return buildWebScheduleHtml_(path);
+function buildPrintableHtml_(attachment) {
+  return buildWebScheduleHtml_(attachment);
 }
 
 
-function buildWebScheduleHtml_(path) {
+function buildWebScheduleHtml_(attachment) {
+  const path = attachment.path;
   const target = path.indexOf('prof-') === 0
-    ? { type: 'teacher', title: findProfessorOption_(path).title }
+    ? { type: 'teacher', title: findProfessorOption_(path).title, email: attachment.email }
     : { type: 'group', title: findClassOption_(path).title };
   const payload = JSON.parse(fetchText_(HORARIOS_WEB_BASE_URL + '/api_horarios.php?colegio=ALF'));
   const sessions = payload.data || [];
+  if (target.type === 'teacher') {
+    const directoryEntry = getProfessorDirectory_().find((entry) =>
+      String(entry.email || '').trim().toLowerCase() === String(target.email || '').trim().toLowerCase()
+    );
+    if (directoryEntry && directoryEntry.scheduleName) target.scheduleName = directoryEntry.scheduleName;
+  }
   const matchingSessions = target.type === 'group'
     ? sessions.filter((session) => normalize_(session.Grupo_Nombre) === normalize_(target.title))
-    : sessions.filter((session) => session.Persona_Guid === findTeacherGuid_(sessions, target.title, path));
+    : sessions.filter((session) => session.Persona_Guid === findTeacherGuid_(sessions, target.scheduleName || target.title, path));
   if (!matchingSessions.length) {
     throw new Error('No hay datos en la web de horarios para ' + target.title);
   }
