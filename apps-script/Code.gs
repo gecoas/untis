@@ -313,6 +313,7 @@ function matchProfessor_(name, sheetName, timetables, directory, email) {
   );
   const wantedNames = [tokens_(name)];
   if (directoryEntry && directoryEntry.scheduleName) wantedNames.push(tokens_(directoryEntry.scheduleName));
+  if (directoryEntry && directoryEntry.name) wantedNames.push(tokens_(directoryEntry.name));
   let best = null;
   let bestScore = 0;
   filterTimetablesForSheet_(timetables || getProfessorTimetables_(), sheetName).forEach(([title, path]) => {
