@@ -395,7 +395,7 @@ function buildWebScheduleHtml_(path) {
   const sessions = payload.data || [];
   const matchingSessions = target.type === 'group'
     ? sessions.filter((session) => normalize_(session.Grupo_Nombre) === normalize_(target.title))
-    : sessions.filter((session) => session.Persona_Guid === findTeacherGuid_(sessions, target.title));
+    : sessions.filter((session) => session.Persona_Guid === findTeacherGuid_(sessions, target.title, path));
   if (!matchingSessions.length) {
     throw new Error('No hay datos en la web de horarios para ' + target.title);
   }
@@ -450,7 +450,7 @@ function buildWebScheduleHtml_(path) {
 }
 
 
-function findTeacherGuid_(sessions, title) {
+function findTeacherGuid_(sessions, title, path) {
   const teachers = {};
   sessions.forEach((session) => {
     if (!session.Persona_Guid) return;
@@ -468,6 +468,12 @@ function findTeacherGuid_(sessions, title) {
       bestGuid = guid;
     }
   });
+  if (!bestGuid || bestScore === 0) {
+    const fileAlias = normalize_(String(path || '').split('/').pop().replace(/^Profesores_/, '').replace(/\.htm$/i, ''));
+    bestGuid = Object.keys(teachers).find((guid) =>
+      normalize_(guid) === fileAlias || normalize_(teachers[guid]) === fileAlias
+    ) || bestGuid;
+  }
   return bestGuid;
 }
 
