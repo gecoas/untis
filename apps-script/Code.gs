@@ -469,9 +469,10 @@ function findTeacherGuid_(sessions, title, path) {
     }
   });
   if (!bestGuid || bestScore === 0) {
-    const fileAlias = normalize_(String(path || '').split('/').pop().replace(/^Profesores_/, '').replace(/\.htm$/i, ''));
+    const fileAlias = normalize_(String(path || '').split('/').pop().replace(/^Profesores_/, '').replace(/\.htm$/i, '').replace(/\d+$/, ''));
     bestGuid = Object.keys(teachers).find((guid) =>
-      normalize_(guid) === fileAlias || normalize_(teachers[guid]) === fileAlias
+      normalize_(guid) === fileAlias || normalize_(teachers[guid]) === fileAlias ||
+      (fileAlias.length >= 3 && (normalize_(guid).indexOf(fileAlias) === 0 || normalize_(teachers[guid]).indexOf(fileAlias) === 0))
     ) || bestGuid;
   }
   return bestGuid;
