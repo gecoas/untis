@@ -442,7 +442,7 @@ function buildWebScheduleHtml_(path) {
     table += '</tr>';
   });
   table += '</tbody></table>';
-  const css = fetchText_(HORARIOS_WEB_BASE_URL + '/style.css?v=20261021d');
+  const css = fetchText_(HORARIOS_WEB_BASE_URL + '/style.css');
   const generatedAt = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'dd/MM/yyyy HH:mm');
   return '<!doctype html><html lang="es"><head><meta charset="UTF-8"><style>' + css +
     '</style><style>@page{size:A4 landscape;margin:5mm}*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}html,body{width:100%;height:100%;overflow:hidden}body{background:#fff}main{max-width:none;margin:0;padding:0}.tables-container{display:block}.schedule-table{width:100%;font-size:8pt;page-break-inside:avoid;break-inside:avoid}.schedule-table caption{position:static;font-size:12pt;padding:.35rem .5rem}.schedule-table thead th{position:static}.schedule-table th,.schedule-table td{padding:.25rem .35rem;line-height:1.15}.schedule-table tbody th{width:70px}.schedule-table tr{page-break-inside:avoid;break-inside:avoid}.print-generated-at{display:block;position:fixed;top:0;right:0;color:#fff;font-size:8pt}</style></head><body><div class="print-generated-at">Generado: ' + generatedAt + '</div><main><div class="tables-container">' +
