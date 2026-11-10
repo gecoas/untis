@@ -411,14 +411,18 @@ function buildWebScheduleHtml_(attachment) {
   const payload = JSON.parse(fetchText_(HORARIOS_WEB_BASE_URL + '/api_horarios.php?colegio=ALF'));
   const sessions = payload.data || [];
   if (target.type === 'teacher') {
-    const directoryEntry = getProfessorDirectory_().find((entry) =>
+    const directoryPayload = JSON.parse(fetchText_(HORARIOS_WEB_DIRECTORY_URL));
+    const directoryEntry = (directoryPayload.directory || []).find((entry) =>
       String(entry.email || '').trim().toLowerCase() === String(target.email || '').trim().toLowerCase()
     );
     if (directoryEntry && directoryEntry.scheduleName) target.scheduleName = directoryEntry.scheduleName;
+    target.guid = Object.keys(directoryPayload.emails || {}).find((guid) =>
+      String(directoryPayload.emails[guid] || '').trim().toLowerCase() === String(target.email || '').trim().toLowerCase()
+    ) || '';
   }
   const matchingSessions = target.type === 'group'
     ? sessions.filter((session) => normalize_(session.Grupo_Nombre) === normalize_(target.title))
-    : sessions.filter((session) => session.Persona_Guid === findTeacherGuid_(sessions, target.scheduleName || target.title, path));
+    : sessions.filter((session) => session.Persona_Guid === (target.guid || findTeacherGuid_(sessions, target.scheduleName || target.title, path)));
   if (!matchingSessions.length) {
     throw new Error('No hay datos en la web de horarios para ' + target.title);
   }
